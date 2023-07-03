@@ -37,6 +37,10 @@ cc_library(
     hdrs = [
         ":pydin_ext_headers",
     ],
+    copts = [
+        "-DCC=$(CC)",
+        "-DCXX=$(CXX)",
+    ],
     defines = [
         "PYBIND11_DETAILED_ERROR_MESSAGES",
         "ODIN_USE_GLOG",
