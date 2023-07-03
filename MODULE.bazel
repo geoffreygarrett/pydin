@@ -1,0 +1,67 @@
+# MODULE.bazel
+module(name = "pydin", repo_name = "com_github_geoffreygarrett_pydin", version = "0.1.0")
+
+bazel_dep(name = "odin", version = "0.1.0")
+local_path_override(module_name = "odin", path = "../odin")
+
+bazel_dep(name = "rules_pkg", version = "0.9.1")
+
+# RULES PYTHON ##########################################################
+bazel_dep(name = "rules_python", version = "0.23.1")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.10",
+)
+
+#load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+#
+#python_register_toolchains(
+#    name = "python3_10",
+#    python_version = "3.10",
+#)
+#
+#load("@python3_10//:defs.bzl", "interpreter")`
+interpreter = use_extension("@rules_python//python/extensions:interpreter.bzl", "interpreter")
+interpreter.install(
+    name = "interpreter",
+    python_name = "python_3_10",
+)
+use_repo(interpreter, "interpreter")
+
+# https://bazel.build/external/migration
+bazel_dep(name = "rules_cc", version = "0.0.6")
+bazel_dep(name = "platforms", version = "0.0.6")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+pybind = use_extension("//:extensions.bzl", "pybind")
+pybind.configure(
+    name = "local_config_python",
+    python_interpreter_target = "//:interpreter",
+)
+
+use_repo(pybind, "pybind11_bazel", "pybind11", "local_config_python")
+
+#use_repo(python_configure)
+
+#use_repo(pybind, "pybind11_bazel", "pybind11")
+# Then you use the function to create an extension with the given interpreter.
+#pybind = use_extension("//:extensions.bzl", "pybind_module_extension", interpreter = "interpreter")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    name = "pip",
+    requirements_lock = "//:requirements_lock.txt",
+)
+use_repo(pip, "pip")
+
+## https://github.com/bazelbuild/rules_python/blob/main/examples/bzlmod/MODULE.bazel
+#
+#pip = use_extension("@rules_python//python:extensions.bzl", "pip")
+#
+#pip.parse(
+#    name = "pip",
+#    requirements_lock = "//:requirements_lock.txt",
+#)
+#
+#use_repo(pip, "pip", "pip_310")

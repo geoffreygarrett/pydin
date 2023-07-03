@@ -1,0 +1,39 @@
+# Python related
+*.py[cod]
+*.so
+*.dylib
+*.dll
+*~
+__pycache__/
+
+# Bazel build
+/bazel-*
+*.runfiles/
+
+# Pybind specific
+*.so
+*.pyd
+
+# virtual environment
+env/
+venv/
+*.venv
+.venv/
+
+# IDEs and text editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and databases
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
