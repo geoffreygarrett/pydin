@@ -16,3 +16,5 @@ def pybind11_dependency():
         strip_prefix = "pybind11-2.10.4",
         urls = ["https://github.com/pybind/pybind11/archive/v2.10.4.zip"],
     )
+
+#def cereal_dependency():

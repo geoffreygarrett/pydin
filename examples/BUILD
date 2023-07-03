@@ -13,7 +13,7 @@ py_binary(
     deps = [
         requirement("numpy"),
         requirement("matplotlib"),
-        "//pydin",
+        "//:pydin",
     ],
 )
 
@@ -25,7 +25,7 @@ py_binary(
         requirement("numpy"),
         requirement("matplotlib"),
         requirement("numba"),
-        "//pydin",
+        "//:pydin",
     ],
 )
 
@@ -41,7 +41,7 @@ py_binary(
         requirement("numpy"),
         requirement("matplotlib"),
         requirement("scikit-learn"),
-        "//pydin",
+        "//:pydin",
     ],
 )
 
