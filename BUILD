@@ -7,21 +7,6 @@ load(
     "requirement",
 )
 
-#load("@//:bazel/pybind11/build_defs.bzl", "pybind_extension")
-#    "all_requirements",
-#    "all_whl_requirements",
-#    "data_requirement",
-#    #    "entry_point",
-#    "requirement",
-#)
-##load(
-##    "@pip//:requirements.bzl",
-##    "data_requirement",
-##    "dist_info_requirement",
-##    "entry_point",
-##    "requirement",
-##)
-
 ## PYBIND EXTENSION: CORE ###############################################
 filegroup(
     name = "pydin_ext_headers",
@@ -38,8 +23,8 @@ cc_library(
         ":pydin_ext_headers",
     ],
     copts = [
-        "-DCC=$(CC)",
-        "-DCXX=$(CXX)",
+        "-DCC=$$(CC)",
+        "-DCXX=$$(CXX)",
     ],
     defines = [
         "PYBIND11_DETAILED_ERROR_MESSAGES",
