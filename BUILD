@@ -40,13 +40,9 @@ cc_library(
             "-DCPPFLAGS=$$(CPPFLAGS)",
         ],
         "@platforms//os:windows": [
-            # clang-cl
             "-mwaitpkg",
-        ] + select({
-            "@platforms//cpu:x86_64": [
-            ],
-            "//conditions:default": [],
-        }),
+            # additional flags
+        ],
         "//conditions:default": [],
     }),
     defines = [
