@@ -288,8 +288,8 @@ genrule(
         PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
         mv $$OUT_DIR/core/* $$EXEC_DIR
         rm -r $$OUT_DIR
-        cd $(@D)/pydin
-        zip -r $(@D)/pydin.zip .
+        cd $(@D)
+        zip -r pydin.zip pydin
     """,
     tools = [
         ":pybind11-stubgen",
