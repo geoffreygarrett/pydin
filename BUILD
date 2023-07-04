@@ -27,6 +27,8 @@ cc_library(
             "-fexperimental-library",
             "-DCC=$$(CC)",
             "-DCXX=$$(CXX)",
+            "-DLDFLAGS=$$(LDFLAGS)",
+            "-DCPPFLAGS=$$(CPPFLAGS)",
         ],
         "//conditions:default": [],
     }),
