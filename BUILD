@@ -39,30 +39,30 @@ config_setting(
 
 CORE_LINKOPTS = select({
     ":msvc_compiler": [
-        "/openmp",
+        #        "/openmp",
     ],
     "@platforms//os:osx": [
         # openmp
-        "-lomp",
-        "-fopenmp",
+        #        "-lomp",
+        #        "-fopenmp",
     ],
     "//conditions:default": [
-        "-fopenmp",
+        #        "-fopenmp",
     ],
 })
 
 CORE_COPTS = select({
     ":msvc_compiler": [
-        "/openmp",
+        #        "/openmp",
     ],
     "@platforms//os:osx": [
 
         # openmp
         "-Xpreprocessor",
-        "-fopenmp",
+        #        "-fopenmp",
     ],
     "//conditions:default": [
-        "-fopenmp",
+        #        "-fopenmp",
     ],
 })
 
@@ -91,7 +91,7 @@ cc_library(
 pybind_extension(
     name = "core",
     srcs = ["core.cpp"],
-    copts = ["-fopenmp"] + CORE_COPTS,
+    copts = CORE_COPTS,
     includes = ["pydin/include"],
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],

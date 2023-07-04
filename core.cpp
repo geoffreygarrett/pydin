@@ -5,7 +5,7 @@
 #include <pydin/bind_astro.hpp>
 #include <pydin/bind_logging.hpp>
 #include <pydin/bind_mcts.hpp>
-#include <pydin/bind_omp.hpp>
+//#include <pydin/bind_omp.hpp>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -15,8 +15,8 @@ using namespace pybind11::literals;
 
 
 PYBIND11_MODULE(core, m) {
-    auto m_omp = m.def_submodule("omp");
-    bind_omp(m_omp, "");
+//    auto m_omp = m.def_submodule("omp");
+//    bind_omp(m_omp, "");
 
     auto m_logging = m.def_submodule("logging");
     bind_logging(m_logging, "");
