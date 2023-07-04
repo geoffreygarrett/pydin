@@ -41,6 +41,7 @@ cc_library(
         ],
         "@bazel_tools//src/conditions:windows": [
             # clang-cl
+            "-mwaitpkg",
             "-march=native",
         ],
         "//conditions:default": [],
