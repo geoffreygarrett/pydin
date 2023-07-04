@@ -271,6 +271,15 @@ genrule(
         ":pybind11-stubgen",
     ],
 )
+#
+#$ cat BUILD
+#genrule(
+#  name = "gen_zip",
+#  srcs = glob(["dir/*"]),
+#  tools = ["@bazel_tools//tools/zip:zipper"],
+#  outs = ["files.zip"],
+#  cmd = "$(location @bazel_tools//tools/zip:zipper) c $@ $(SRCS)",
+#)
 
 genrule(
     name = "pydin-zip",
@@ -285,8 +294,8 @@ genrule(
         OUT_DIR=$$(realpath $(@D)/pydin-stubs)
         EXEC_DIR=$(@D)/pydin
         mkdir -p $$OUT_DIR
-        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
-        mv $$OUT_DIR/core/* $$EXEC_DIR
+#        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
+#        mv $$OUT_DIR/core/* $$EXEC_DIR
         rm -r $$OUT_DIR
         cd $(@D)
         zip -r pydin.zip pydin
