@@ -289,19 +289,23 @@ genrule(
     ],
     outs = ["pydin.zip"],
     cmd = """
-        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
-        rm -r $(locations :pydin_files)
+
+#        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
+#        rm -r $(locations :pydin_files)
         OUT_DIR=$$(realpath $(@D)/pydin-stubs)
         EXEC_DIR=$(@D)/pydin
-        mkdir -p $$OUT_DIR
+#        mkdir -p $$OUT_DIR
 #        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
 #        mv $$OUT_DIR/core/* $$EXEC_DIR
-        rm -r $$OUT_DIR
-        cd $(@D)
-        zip -r pydin.zip pydin
+#        rm -r $$OUT_DIR
+#        $(location @bazel_tools//tools/zip:zipper) c pydin.zip -d $(@D)
+#        cd $(@D)
+#        zip -r pydin.zip pydin
+        $(location @bazel_tools//tools/zip:zipper) vcf $@ $(@D)/*
     """,
     tools = [
         ":pybind11-stubgen",
+        "@bazel_tools//tools/zip:zipper",
     ],
 )
 
