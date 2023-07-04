@@ -39,16 +39,14 @@ cc_library(
             "-DLDFLAGS=$$(LDFLAGS)",
             "-DCPPFLAGS=$$(CPPFLAGS)",
         ],
-        #        "@platforms//os:windows": [
-        #            # clang-cl
-        #            "-mwaitpkg",
-        #            "-march=native",
-        #        ],
-        ":x64_windows-clang-cl": [
+        "@platforms//os:windows": [
             # clang-cl
             "-mwaitpkg",
-            "-march=native",
-        ],
+        ] + select({
+            "@platforms//cpu:x86_64": [
+            ],
+            "//conditions:default": [],
+        }),
         "//conditions:default": [],
     }),
     defines = [
