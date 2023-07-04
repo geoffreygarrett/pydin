@@ -39,10 +39,6 @@ cc_library(
             "-DLDFLAGS=$$(LDFLAGS)",
             "-DCPPFLAGS=$$(CPPFLAGS)",
         ],
-        "@platforms//os:windows": [
-            "-mwaitpkg",
-            # additional flags
-        ],
         "//conditions:default": [],
     }),
     defines = [
