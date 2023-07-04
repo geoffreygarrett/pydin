@@ -33,11 +33,14 @@ cc_library(
     ],
     copts = select({
         "@platforms//os:osx": [
-            "-fexperimental-library",
-            "-DCC=$$(CC)",
-            "-DCXX=$$(CXX)",
-            "-DLDFLAGS=$$(LDFLAGS)",
-            "-DCPPFLAGS=$$(CPPFLAGS)",
+            #            "-fexperimental-library",
+            #            "-DCC=$$(CC)",
+            #            "-DCXX=$$(CXX)",
+            #            "-DLDFLAGS=$$(LDFLAGS)",
+            #            "-DCPPFLAGS=$$(CPPFLAGS)",
+            # openmp
+            "-Xpreprocessor",
+            "-fopenmp",
         ],
         "//conditions:default": [],
     }),
@@ -47,6 +50,13 @@ cc_library(
         #        "GLOG_CUSTOM_PREFIX_SUPPORT",
     ],
     includes = ["include"],
+    linkopts = select({
+        "@platforms//os:osx": [
+            # openmp
+            "-lomp",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         #        "@com_github_google_glog//:glog",
