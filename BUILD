@@ -26,37 +26,59 @@ filegroup(
     ]),
 )
 
+# "-fexperimental-library",
+# "-DCC=$$(CC)",
+# "-DCXX=$$(CXX)",
+# "-DLDFLAGS=$$(LDFLAGS)",
+# "-DCPPFLAGS=$$(CPPFLAGS)",
+
+config_setting(
+    name = "msvc_compiler",
+    flag_values = {"@bazel_tools//tools/cpp:compiler": "msvc-cl"},
+)
+
+CORE_LINKOPTS = select({
+    ":msvc_compiler": [
+        "/openmp",
+    ],
+    "@platforms//os:osx": [
+        # openmp
+        "-lomp",
+        "-fopenmp",
+    ],
+    "//conditions:default": [
+        "-fopenmp",
+    ],
+})
+
+CORE_COPTS = select({
+    ":msvc_compiler": [
+        "/openmp",
+    ],
+    "@platforms//os:osx": [
+
+        # openmp
+        "-Xpreprocessor",
+        "-fopenmp",
+    ],
+    "//conditions:default": [
+        "-fopenmp",
+    ],
+})
+
 cc_library(
     name = "pydin_ext_lib",
     hdrs = [
         ":pydin_ext_headers",
     ],
-    copts = select({
-        "@platforms//os:osx": [
-            #            "-fexperimental-library",
-            #            "-DCC=$$(CC)",
-            #            "-DCXX=$$(CXX)",
-            #            "-DLDFLAGS=$$(LDFLAGS)",
-            #            "-DCPPFLAGS=$$(CPPFLAGS)",
-            # openmp
-            "-Xpreprocessor",
-            "-fopenmp",
-        ],
-        "//conditions:default": [],
-    }),
+    copts = CORE_COPTS,
     defines = [
         "PYBIND11_DETAILED_ERROR_MESSAGES",
         #        "ODIN_USE_GLOG",
         #        "GLOG_CUSTOM_PREFIX_SUPPORT",
     ],
     includes = ["include"],
-    linkopts = select({
-        "@platforms//os:osx": [
-            # openmp
-            "-lomp",
-        ],
-        "//conditions:default": [],
-    }),
+    linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         #        "@com_github_google_glog//:glog",
@@ -69,11 +91,9 @@ cc_library(
 pybind_extension(
     name = "core",
     srcs = ["core.cpp"],
+    copts = ["-fopenmp"] + CORE_COPTS,
     includes = ["pydin/include"],
-    linkopts = [
-        "-fopenmp",
-        # "-fvisibility=default",  # https://groups.google.com/g/cerealcpp/c/qmpit5GEcZU
-    ],
+    linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         ":pydin_ext_lib",
@@ -368,6 +388,16 @@ pkg_zip(
     ],
     #    strip_prefix = "/",
 )
+
+# all tests
+#py_test(
+#    name = "all_tests",
+#    srcs = glob(["*_test.py"]),
+#    visibility = ["//visibility:public"],
+#    deps = [
+#        "//:tests
+#    ],
+#)
 
 py_binary(
     name = "foo_test",
