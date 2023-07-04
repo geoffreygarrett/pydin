@@ -43,13 +43,13 @@ cc_library(
     }),
     defines = [
         "PYBIND11_DETAILED_ERROR_MESSAGES",
-        "ODIN_USE_GLOG",
-        "GLOG_CUSTOM_PREFIX_SUPPORT",
+        #        "ODIN_USE_GLOG",
+        #        "GLOG_CUSTOM_PREFIX_SUPPORT",
     ],
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_google_glog//:glog",
+        #        "@com_github_google_glog//:glog",
         "@com_github_oneapi_onetbb//:tbb",
         "@com_github_uscilab_cereal//:cereal",
         "@odin",
