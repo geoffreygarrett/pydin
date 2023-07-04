@@ -32,14 +32,19 @@ cc_library(
         ":pydin_ext_headers",
     ],
     copts = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-fexperimental-library",
             "-DCC=$$(CC)",
             "-DCXX=$$(CXX)",
             "-DLDFLAGS=$$(LDFLAGS)",
             "-DCPPFLAGS=$$(CPPFLAGS)",
         ],
-        "@bazel_tools//src/conditions:windows": [
+        #        "@platforms//os:windows": [
+        #            # clang-cl
+        #            "-mwaitpkg",
+        #            "-march=native",
+        #        ],
+        ":x64_windows-clang-cl": [
             # clang-cl
             "-mwaitpkg",
             "-march=native",
