@@ -22,10 +22,14 @@ cc_library(
     hdrs = [
         ":pydin_ext_headers",
     ],
-    copts = [
-        "-DCC=$$(CC)",
-        "-DCXX=$$(CXX)",
-    ],
+    copts = select({
+        "@bazel_tools//src/conditions:darwin": [
+            "-fexperimental-library",
+            "-DCC=$$(CC)",
+            "-DCXX=$$(CXX)",
+        ],
+        "//conditions:default": [],
+    }),
     defines = [
         "PYBIND11_DETAILED_ERROR_MESSAGES",
         "ODIN_USE_GLOG",
