@@ -7,6 +7,15 @@ load(
     "requirement",
 )
 
+platform(
+    name = "x64_windows-clang-cl",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:windows",
+        "@bazel_tools//tools/cpp:clang-cl",
+    ],
+)
+
 ## PYBIND EXTENSION: CORE ###############################################
 filegroup(
     name = "pydin_ext_headers",
@@ -29,6 +38,10 @@ cc_library(
             "-DCXX=$$(CXX)",
             "-DLDFLAGS=$$(LDFLAGS)",
             "-DCPPFLAGS=$$(CPPFLAGS)",
+        ],
+        "@bazel_tools//src/conditions:windows": [
+            # clang-cl
+            "-march=native",
         ],
         "//conditions:default": [],
     }),
