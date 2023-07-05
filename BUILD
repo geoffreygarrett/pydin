@@ -123,11 +123,6 @@ pybind_stubgen(
 
 ## pydin library ####################################################################################
 alias(
-    name = "pybind11-stubgen",
-    actual = entry_point("pybind11-stubgen", "pybind11-stubgen"),
-)
-
-alias(
     name = "black",
     actual = entry_point("black", "black"),
 )
@@ -138,7 +133,6 @@ genrule(
     cmd = "echo \"\"\"from .core import *\"\"\" > $(OUTS)",
     tools = [
         ":black",
-        ":pybind11-stubgen",
         ":stub_generator",
     ],
 )
