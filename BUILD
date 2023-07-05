@@ -1,5 +1,6 @@
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
 load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
+load("@rules_pkg//pkg:mappings.bzl", "filter_directory", "pkg_files", "pkg_mklink", "strip_prefix")
 load(
     "@pip//:requirements.bzl",
     "data_requirement",
@@ -158,7 +159,7 @@ py_library(
 #        ":pydin_files",
 #        ":pydin",
 #    ],
-#    outs = ["pydin.tar"],
+#    outs = ["pydin.tar.gz"],
 #    cmd = """
 #        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
 #        rm -r $(locations :pydin_files)
@@ -168,145 +169,102 @@ py_library(
 #        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
 #        mv $$OUT_DIR/core/* $$EXEC_DIR
 #        rm -r $$OUT_DIR
-#        tar -cf $(@D)/pydin.tar -C $(@D)/pydin .
+#        tar -czf $(@D)/pydin.tar.gz -C $(@D)/pydin .
 #    """,
 #    tools = [
 #        ":pybind11-stubgen",
 #    ],
 #)
 
-#genrule(
-#    name = "pydin-tar",
-#    srcs = [
-#        ":pydin_files",
-#        ":pydin",
-#    ],
-#    outs = [
-#        "pydin.tar.gz",
-#        "pydin.zip",
-#    ],
-#    cmd = """
-#        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
-#        rm -r $(locations :pydin_files)
-#        OUT_DIR=$$(realpath $(@D)/pydin-stubs)
-#        EXEC_DIR=$(@D)/pydin
-#        mkdir -p $$OUT_DIR
-#        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
-#        mv $$OUT_DIR/core/* $$EXEC_DIR
-#        rm -r $$OUT_DIR
-#        if [ -z $${OS+x} ]; then
-#            OS=$$(uname -s)
-#        fi
-#        if [ "$$OS" == "Windows_NT" ] || [ "$$OS" == "MINGW64_NT-10.0" ]; then
-#            # On Windows, use zip instead of tar
-#            cd $(@D)/pydin
-#            zip -r $(@D)/pydin.zip .
-#        else
-#            tar -czf $(@D)/pydin.tar.gz -C $(@D)/pydin .
-#        fi
-#    """,
-#    tools = [
-#        ":pybind11-stubgen",
-#    ],
-#)
+STUB_OUTPUT_COMMON = [
+    "pydin/core.so",
+    "pydin/__init__.py",
+    "pydin/core/__init__.pyi",
+    "pydin/core/mip/__init__.pyi",
+    "pydin/core/logging/__init__.pyi",
+]
 
-#genrule(
-#    name = "pydin-tar",
-#    srcs = [
-#        ":pydin_files",
-#        ":pydin",
-#    ],
-#    outs = [
-#        "pydin.tar.gz",
-#        "pydin.zip",
-#    ],
-#    cmd = select({
-#        "@bazel_tools//src/conditions:windows": """
-#            mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
-#            rm -r $(locations :pydin_files)
-#            OUT_DIR=$$(realpath $(@D)/pydin-stubs)
-#            EXEC_DIR=$(@D)/pydin
-#            mkdir -p $$OUT_DIR
-#            PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
-#            mv $$OUT_DIR/core/* $$EXEC_DIR
-#            rm -r $$OUT_DIR
-#            cd $(@D)/pydin
-#            zip -r $(@D)/pydin.zip .
-#        """,
-#        "//conditions:default": """
-#            mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
-#            rm -r $(locations :pydin_files)
-#            OUT_DIR=$$(realpath $(@D)/pydin-stubs)
-#            EXEC_DIR=$(@D)/pydin
-#            mkdir -p $$OUT_DIR
-#            PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
-#            mv $$OUT_DIR/core/* $$EXEC_DIR
-#            rm -r $$OUT_DIR
-#            tar -czf $(@D)/pydin.tar.gz -C $(@D)/pydin .
-#        """,
-#    }),
-#    tools = [
-#        ":pybind11-stubgen",
-#    ],
-#)
 genrule(
-    name = "pydin-tar",
+    name = "pydin-with-stubs",
     srcs = [
         ":pydin_files",
         ":pydin",
     ],
-    outs = ["pydin.tar.gz"],
-    cmd = """
+    outs = STUB_OUTPUT_COMMON,
+    cmd = select({
+        "//conditions:default": """
         mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
-        rm -r $(locations :pydin_files)
-        OUT_DIR=$$(realpath $(@D)/pydin-stubs)
         EXEC_DIR=$(@D)/pydin
+        OUT_DIR=$$(realpath $(@D)/pydin-stubs)
         mkdir -p $$OUT_DIR
+        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
+        mv $$OUT_DIR/core/* $$EXEC_DIR/core/
+        rm -r $$OUT_DIR
+    """,
+        "@platforms//os:windows": """
+        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
+        EXEC_DIR=$(@D)/pydin
+        OUT_DIR=$$(realpath $(@D)/pydin-stubs)
+        mkdir -p $$OUT_DIR
+        mklink $$EXEC_DIR/core.pyd $$EXEC_DIR/core.so
         PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
         mv $$OUT_DIR/core/* $$EXEC_DIR
         rm -r $$OUT_DIR
-        tar -czf $(@D)/pydin.tar.gz -C $(@D)/pydin .
     """,
+    }),
     tools = [
         ":pybind11-stubgen",
     ],
 )
-#
-#$ cat BUILD
+
 #genrule(
-#  name = "gen_zip",
-#  srcs = glob(["dir/*"]),
-#  tools = ["@bazel_tools//tools/zip:zipper"],
-#  outs = ["files.zip"],
-#  cmd = "$(location @bazel_tools//tools/zip:zipper) c $@ $(SRCS)",
+#    name = "pydin-with-stubs-windows",
+#    srcs = [
+#        ":pydin_files",
+#        ":pydin",
+#    ],
+#    outs = STUB_OUTPUT_WINDOWS,
+#    cmd = """
+#        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
+#        EXEC_DIR=$(@D)/pydin
+#        OUT_DIR=$$(realpath $(@D)/pydin-stubs)
+#        mkdir -p $$OUT_DIR
+#        # rename before executing core
+#        mv $$EXEC_DIR/core.so $$EXEC_DIR/core.pyd
+#        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
+#        mv $$OUT_DIR/core/* $$EXEC_DIR/core/
+#        rm -r $$OUT_DIR
+#    """,
+#    tools = [
+#        ":pybind11-stubgen",
+#    ],
 #)
 
-genrule(
+pkg_mklink(
+    name = "windows-symlink",  # Arbitrary name for this rule
+    link_name = "core.pyd",  # The name of the link
+    target = "core.so",  # What the link points to
+)
+
+pkg_zip(
     name = "pydin-zip",
     srcs = [
-        ":pydin_files",
-        ":pydin",
+        ":pydin-with-stubs",
+        ":windows-symlink",
     ],
-    outs = ["pydin.zip"],
-    cmd = """
+    out = "pydin.zip",
+    strip_prefix = strip_prefix.from_pkg("external/pydin/pydin"),
+    visibility = ["//visibility:public"],
+)
 
-#        mkdir -p $(@D)/pydin && cp $(locations :pydin_files) $(@D)/pydin
-#        rm -r $(locations :pydin_files)
-        OUT_DIR=$$(realpath $(@D)/pydin-stubs)
-        EXEC_DIR=$(@D)/pydin
-#        mkdir -p $$OUT_DIR
-#        PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
-#        mv $$OUT_DIR/core/* $$EXEC_DIR
-#        rm -r $$OUT_DIR
-#        $(location @bazel_tools//tools/zip:zipper) c pydin.zip -d $(@D)
-#        cd $(@D)
-#        zip -r pydin.zip pydin
-        $(location @bazel_tools//tools/zip:zipper) vcf $@ $(@D)/*
-    """,
-    tools = [
-        ":pybind11-stubgen",
-        "@bazel_tools//tools/zip:zipper",
+pkg_tar(
+    name = "pydin-tar",
+    srcs = [
+        ":pydin-with-stubs",
     ],
+    out = "pydin.tar.gz",
+    strip_prefix = strip_prefix.from_pkg("external/pydin/pydin"),
+    visibility = ["//visibility:public"],
 )
 
 ## pybind11 pydin stubs #############################################################################
@@ -399,6 +357,7 @@ pkg_zip(
     srcs = [
         ":package_files",
     ],
+    visibility = ["//visibility:package"],
     #    strip_prefix = "/",
 )
 
