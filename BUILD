@@ -249,11 +249,13 @@ pkg_mklink(
 pkg_zip(
     name = "pydin-zip",
     srcs = [
-        ":pydin-with-stubs",
+        #        ":pydin-with-stubs",
         ":windows-symlink",
+        ":pydin_files",
+        ":pydin",
     ],
     out = "pydin.zip",
-    strip_prefix = strip_prefix.from_pkg("external/pydin/pydin"),
+    strip_prefix = strip_prefix.from_pkg("external/pydin"),
     visibility = ["//visibility:public"],
 )
 
