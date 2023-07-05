@@ -16,7 +16,13 @@ using namespace pybind11::literals;
 
 PYBIND11_MODULE(core, m) {
 //    auto m_omp = m.def_submodule("omp");
-//    bind_omp(m_omp, "");
+//    bind_omp(m_omp, ""); https://stackoverflow.com/questions/69745880/how-can-i-multithread-this-code-snippet-in-c-with-eigen
+
+#ifdef CORE_VERSION_INFO
+    m.attr("__version__") = CORE_VERSION_INFO;
+#else
+    m.attr("__version__") = "dev";
+#endif
 
     auto m_logging = m.def_submodule("logging");
     bind_logging(m_logging, "");
