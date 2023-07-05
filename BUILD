@@ -206,7 +206,7 @@ genrule(
         EXEC_DIR=$(@D)/pydin
         OUT_DIR=$$(realpath $(@D)/pydin-stubs)
         mkdir -p $$OUT_DIR
-        mklink $$EXEC_DIR/core.pyd $$EXEC_DIR/core.so
+        ln -s $$EXEC_DIR/core.pyd $$EXEC_DIR/core.so
         PYTHONPATH=$$EXEC_DIR $(execpath :pybind11-stubgen) core -o $$OUT_DIR --root-module-suffix ''
         mv $$OUT_DIR/core/* $$EXEC_DIR
         rm -r $$OUT_DIR
