@@ -18,13 +18,6 @@ platform(
 )
 
 ## PYBIND EXTENSION: CORE ###############################################
-
-# "-fexperimental-library",
-# "-DCC=$$(CC)",
-# "-DCXX=$$(CXX)",
-# "-DLDFLAGS=$$(LDFLAGS)",
-# "-DCPPFLAGS=$$(CPPFLAGS)",
-
 config_setting(
     name = "msvc_compiler",
     flag_values = {"@bazel_tools//tools/cpp:compiler": "msvc-cl"},
@@ -99,9 +92,7 @@ pybind_extension(
     includes = ["pydin/include"],
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
-    deps = [
-        ":core_libs",
-    ],
+    deps = [":core_libs"],
 )
 
 alias(
