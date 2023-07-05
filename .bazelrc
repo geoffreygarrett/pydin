@@ -26,6 +26,10 @@ build --repo_env PYTHON_BIN_PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/bi
 
 
 run --experimental_enable_bzlmod
+build --experimental_enable_bzlmod
+info --experimental_enable_bzlmod
+query --experimental_enable_bzlmod
+
 #--test_output=<summary, errors, all or streamed> default: "summary"
 #Specifies desired output mode. Valid values are 'summary' to output only test status summary,
 # 'errors' to also print test logs for failed tests, 'all' to print logs for all tests and
