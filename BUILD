@@ -170,10 +170,7 @@ py_library(
     ],
     imports = ["."],
     visibility = ["//visibility:public"],
-    deps = [
-        #        requirement("numpy"),
-        #        requirement("pandas"),
-    ],
+    deps = [requirement("numpy")],
 )
 
 ## pybind11 pydin stubs #############################################################################

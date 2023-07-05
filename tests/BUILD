@@ -18,6 +18,7 @@ py_test(
     deps = [
         "//:pydin",
         requirement("pytest"),
+        requirement("numpy"),
     ],
 )
 
