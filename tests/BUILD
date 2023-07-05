@@ -11,10 +11,12 @@ py_test(
     srcs = ["test_astrodynamics.py"],
     args = [
         "--junit-xml=test_astrodynamics.xml",
+        "-v",
     ],
     python_version = "PY3",
+    visibility = ["//visibility:public"],
     deps = [
-        "//pydin",
+        "//:pydin",
         requirement("pytest"),
     ],
 )
@@ -24,10 +26,12 @@ py_test(
     srcs = ["test_mcts.py"],
     args = [
         "--junit-xml=test_mcts.xml",
+        "-v",
     ],
     python_version = "PY3",
+    visibility = ["//visibility:public"],
     deps = [
-        "//pydin",
+        "//:pydin",
         requirement("pytest"),
         requirement("numba"),
     ],

@@ -92,17 +92,24 @@ pybind_extension(
     includes = ["pydin/include"],
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
-    deps = [":core_libs"],
+    deps = [
+        ":core_libs",
+    ],
 )
 
-alias(
-    name = "pybind11-stubgen",
-    actual = entry_point("pybind11-stubgen", "pybind11-stubgen"),
+py_binary(
+    name = "stub_generator",
+    srcs = ["tools/stub_generator.py"],
+    deps = [
+        requirement("pybind11-stubgen"),
+        requirement("black"),
+    ],
 )
 
 pybind_stubgen(
     name = "core_stubs",
     src = ":core",
+    code_formatter = ":black",
     ignore_invalid = [
         "signature",
         "defaultarg",
@@ -111,14 +118,29 @@ pybind_stubgen(
     module_name = "core",
     no_setup_py = True,
     root_module_suffix = "",
-    tool = ":pybind11-stubgen",
+    tool = ":stub_generator",
 )
 
 ## pydin library ####################################################################################
+alias(
+    name = "pybind11-stubgen",
+    actual = entry_point("pybind11-stubgen", "pybind11-stubgen"),
+)
+
+alias(
+    name = "black",
+    actual = entry_point("black", "black"),
+)
+
 genrule(
     name = "__init__",
     outs = ["__init__.py"],
     cmd = "echo \"\"\"from .core import *\"\"\" > $(OUTS)",
+    tools = [
+        ":black",
+        ":pybind11-stubgen",
+        ":stub_generator",
+    ],
 )
 
 pkg_zip(

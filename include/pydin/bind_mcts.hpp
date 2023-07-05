@@ -12,7 +12,7 @@
 
 namespace state {
     template<typename Integer, typename Float>
-    using mixed_integer_program = std::tuple<std::vector<Integer>, std::vector<Float>>;
+    using mixed_integer_program = std::tuple <std::vector<Integer>, std::vector<Float>>;
 }
 
 namespace action {
@@ -48,26 +48,29 @@ namespace reward {
 //    }
 //}
 
-template<typename Float>
-void bind_running_stats(py::module &m, const std::string &suffix) {
-    py::class_<RunningStats<Float>>(m, ("RunningStats" + suffix).c_str())
-            .def(py::init<bool, bool, bool, bool>(),
-                 "calc_mean"_a     = false,
-                 "calc_variance"_a = false,
-                 "calc_min"_a      = false,
-                 "calc_max"_a      = true)
-            .def("push", &RunningStats<Float>::push, "value"_a)
-            .def("mean", &RunningStats<Float>::mean)
-            .def("variance", &RunningStats<Float>::variance)
-            .def("standard_deviation", &RunningStats<Float>::standard_deviation)
-            .def("min", &RunningStats<Float>::min)
-            .def("max", &RunningStats<Float>::max)
-            .def("count", &RunningStats<Float>::count)
-            .def("clear", &RunningStats<Float>::clear);
-}
+//template<typename Float>
+//py bind_running_stats(py::module &m, const std::string &suffix) {
+//
+//}
 
 template<typename State, typename Action, typename Reward, typename Float = double>
 void bind_mcts(py::module &m, const std::string &suffix) {
+
+    using RunningStatsType = RunningStats<double>;
+    py::class_<RunningStatsType>(m, "RunningStats")
+            .def(py::init<bool, bool, bool, bool>(),
+                 "calc_mean"_a = false,
+                 "calc_variance"_a = false,
+                 "calc_min"_a = false,
+                 "calc_max"_a = true)
+            .def("push", &RunningStatsType::push, "value"_a)
+            .def("mean", &RunningStatsType::mean)
+            .def("variance", &RunningStatsType::variance)
+            .def("standard_deviation", &RunningStatsType::standard_deviation)
+            .def("min", &RunningStatsType::min)
+            .def("max", &RunningStatsType::max)
+            .def("count", &RunningStatsType::count)
+            .def("clear", &RunningStatsType::clear);
 
     //    m.def("test_cpp", &test_cpp<int, double>,
     //          "Test function for MIPState<int, Float>",
@@ -75,6 +78,7 @@ void bind_mcts(py::module &m, const std::string &suffix) {
 
     using py_node_type = PyNode<State, Action, Reward>;
     using py_node_sptr = std::shared_ptr<py_node_type>;
+//    py::module::import("core.RunningStats");
 
     auto node_repr = [](const py_node_type &self) {
         std::stringstream ss;
@@ -83,7 +87,7 @@ void bind_mcts(py::module &m, const std::string &suffix) {
     };
 
     auto get_children = [](py_node_sptr self) {
-        std::vector<py_node_sptr> child_nodes;
+        std::vector <py_node_sptr> child_nodes;
         std::transform(self->children.begin(), self->children.end(), std::back_inserter(child_nodes),
                        [](auto &child) { return std::make_shared<py_node_type>(*child); });
         return child_nodes;
@@ -113,9 +117,9 @@ void bind_mcts(py::module &m, const std::string &suffix) {
     using selection_policy = typename MCTS<State, Action, Reward, Float>::selection_policy;
     using state_transition = typename MCTS<State, Action, Reward, Float>::state_transition;
     using action_generator = typename MCTS<State, Action, Reward, Float>::action_generator;
-    using is_terminal      = typename MCTS<State, Action, Reward, Float>::is_terminal;
-    using reward           = typename MCTS<State, Action, Reward, Float>::reward;
-    using node_type        = Node<State, Action, Reward>;
+    using is_terminal = typename MCTS<State, Action, Reward, Float>::is_terminal;
+    using reward = typename MCTS<State, Action, Reward, Float>::reward;
+    using node_type = Node<State, Action, Reward>;
 
     // Bind the CppNode class
     py::class_<node_type>(m, ("CppNode" + suffix).c_str())
@@ -136,64 +140,65 @@ void bind_mcts(py::module &m, const std::string &suffix) {
         return node->reward_stats.min();
     };
 
-    m.attr("min_value_estimator")  = py::cast(max_value_estimator);
+    m.attr("min_value_estimator") = py::cast(max_value_estimator);
     m.attr("mean_value_estimator") = py::cast(mean_value_estimator);
-    m.attr("max_value_estimator")  = py::cast(min_value_estimator);
+    m.attr("max_value_estimator") = py::cast(min_value_estimator);
 
     // Bind the SelectionPolicy class. The "value" is a pure virtual function, and so is the destructor.
-    py::class_<SelectionPolicy<node_type, Float>, std::shared_ptr<SelectionPolicy<node_type, Float>>>(m, ("SelectionPolicy" + suffix).c_str())
-            .def("__repr__", [](const SelectionPolicy<node_type, Float> &self) {
+    py::class_ < SelectionPolicy < node_type, Float >, std::shared_ptr < SelectionPolicy < node_type, Float>>>(m, (
+            "SelectionPolicy" + suffix).c_str())
+            .def("__repr__", [](const SelectionPolicy <node_type, Float> &self) {
                 std::stringstream ss;
                 ss << "SelectionPolicy()";
                 return ss.str();
             });
 
-    py::class_<UCB1<node_type, Float>, SelectionPolicy<node_type, Float>,
-               std::shared_ptr<UCB1<node_type, Float>>>(m, ("UCB1" + suffix).c_str())
+    py::class_ < UCB1 < node_type, Float >, SelectionPolicy < node_type, Float >,
+            std::shared_ptr < UCB1 < node_type, Float>>>(m, ("UCB1" + suffix).c_str())
             .def(
                     py::init<Float, value_estimator_type>(),
                     "cp"_a = 0.01,
                     py::arg_v("value_estimator", max_value_estimator, "max_value_estimator()"))
-            .def("__repr__", [](const UCB1<node_type, Float> &self) {
+            .def("__repr__", [](const UCB1 <node_type, Float> &self) {
                 std::stringstream ss;
                 ss << "UCB1(cp=" << self.get_cp() << ")";
                 return ss.str();
             });
 
-    py::class_<UCB1Tuned<node_type, Float>, SelectionPolicy<node_type, Float>,
-               std::shared_ptr<UCB1Tuned<node_type, Float>>>(m, ("UCB1Tuned" + suffix).c_str())
+    py::class_ < UCB1Tuned < node_type, Float >, SelectionPolicy < node_type, Float >,
+            std::shared_ptr < UCB1Tuned < node_type, Float>>>(m, ("UCB1Tuned" + suffix).c_str())
             .def(
                     py::init<Float, value_estimator_type>(),
                     "cp"_a = 0.01,
                     py::arg_v("value_estimator", max_value_estimator, "max_value_estimator()"))
-            .def("__repr__", [](const UCB1Tuned<node_type, Float> &self) {
+            .def("__repr__", [](const UCB1Tuned <node_type, Float> &self) {
                 std::stringstream ss;
                 ss << "UCB1Tuned(cp=" << self.get_cp() << ")";
                 return ss.str();
             });
 
-    py::class_<EpsilonGreedy<node_type, Float>, SelectionPolicy<node_type, Float>,
-               std::shared_ptr<EpsilonGreedy<node_type, Float>>>(m, ("EpsilonGreedy" + suffix).c_str())
+    py::class_ < EpsilonGreedy < node_type, Float >, SelectionPolicy < node_type, Float >,
+            std::shared_ptr < EpsilonGreedy < node_type, Float>>>(m, ("EpsilonGreedy" + suffix).c_str())
             .def(
                     py::init<Float, value_estimator_type>(),
                     "epsilon"_a = 0.01,
                     py::arg_v("value_estimator", max_value_estimator, "max_value_estimator()"))
-            .def("__repr__", [](const EpsilonGreedy<node_type, Float> &self) {
+            .def("__repr__", [](const EpsilonGreedy <node_type, Float> &self) {
                 std::stringstream ss;
                 ss << "EpsilonGreedy(epsilon=" << self.get_epsilon() << ")";
                 return ss.str();
             });
 
     using mcts_type = MCTS<State, Action, Reward, Float>;
-    py::class_<mcts_type, std::unique_ptr<mcts_type>>(m, ("MCTS" + suffix).c_str())
-            .def(py::init<State,
-                          action_generator,
-                          state_transition,
-                          is_terminal,
-                          reward,
-                          selection_policy,
-                          size_t,
-                          std::optional<Action>>(),
+    py::class_ < mcts_type, std::unique_ptr < mcts_type >> (m, ("MCTS" + suffix).c_str())
+            .def(py::init < State,
+                 action_generator,
+                 state_transition,
+                 is_terminal,
+                 reward,
+                 selection_policy,
+                 size_t,
+                 std::optional < Action >> (),
                  R"doc(
                  Construct a new MCTS object
 
@@ -226,9 +231,9 @@ void bind_mcts(py::module &m, const std::string &suffix) {
                  "transition"_a,
                  "is_terminal"_a,
                  "reward"_a,
-                 "selection_policy"_a = std::make_shared<UCB1<node_type, Float>>(1.0, max_value_estimator),
-                 "seed"_a             = std::random_device()(),
-                 "initial_action"_a   = std::nullopt)
+                 "selection_policy"_a = std::make_shared < UCB1 < node_type, Float >> (1.0, max_value_estimator),
+                 "seed"_a = std::random_device()(),
+                 "initial_action"_a = std::nullopt)
             .def(
                     "__repr__", [](const mcts_type &mcts) {
                         std::stringstream ss;
@@ -243,7 +248,8 @@ void bind_mcts(py::module &m, const std::string &suffix) {
                     str
                         The string representation of the MCTS object.
                     )doc")
-            .def("search", &mcts_type::search, "iterations"_a = 1000, "seconds"_a = -1.0, "expand_all"_a = false, "contraction"_a = true,
+            .def("search", &mcts_type::search, "iterations"_a = 1000, "seconds"_a = -1.0, "expand_all"_a = false,
+                 "contraction"_a = true,
                  R"doc(
                 Perform a search with the given number of iterations.
 

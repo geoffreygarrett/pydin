@@ -15,3 +15,8 @@
 #    name = "local_config_python",
 #    python_interpreter_target = interpreter,
 #)
+
+local_repository(
+    name = "pybind11_bazel",
+    path = "external/pybind11_bazel",
+)
