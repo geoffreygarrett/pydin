@@ -19,6 +19,9 @@ env/
 venv/
 *.venv
 .venv/
+.clwb/.bazelproject
+.clwb/.project-data-dir.iml
+.clwb/.workspace.iml
 
 # IDEs and text editors
 .vscode/
