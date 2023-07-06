@@ -78,6 +78,7 @@ pybind_library(
         #        "@com_github_google_glog//:glog",
         "@com_github_oneapi_onetbb//:tbb",
         "@com_github_uscilab_cereal//:cereal",
+        #        "@org_gnu_gsl//:gsl",
         "@odin",
     ],
 )
@@ -142,7 +143,7 @@ pkg_zip(
     srcs = [
         ":__init__",
         ":core",
-        ":core_stubs",
+        #        ":core_stubs",
     ],
     out = "pydin.zip",
     strip_prefix = strip_prefix.from_pkg("external/pydin"),
