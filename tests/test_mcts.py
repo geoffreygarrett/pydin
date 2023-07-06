@@ -1,94 +1,119 @@
-import time
-
-import pytest
 import pydin
-from numba import jit
+import numba as nb
+import numpy as np
+from typing import Tuple
+
+DIM: np.int32 = np.int32(3)
+from numpy.typing import NDArray
 
 
-# Helper functions to judge tic-tac-toe game state
-@jit(nopython=True)
-def is_terminal(state):
-    # Check rows
-    for i in range(3):
-        if abs(sum(state[i * 3:(i + 1) * 3])) == 3:
-            return True
-    # Check columns
-    for i in range(3):
-        if abs(sum(state[i::3])) == 3:
-            return True
+@nb.njit(nogil=True)
+def check_winner(state: NDArray[np.int32]) -> np.int32:
+    state_grid = state[:-1].reshape((DIM, DIM))
+
+    for i in range(DIM):
+        if np.abs(state_grid[i, :].sum()) == DIM:
+            return np.sign(state_grid[i, :].sum())
+        elif np.abs(state_grid[:, i].sum()) == DIM:
+            return np.sign(state_grid[:, i].sum())
+
     # Check diagonals
-    if abs(sum(state[::4])) == 3 or abs(sum(state[2:8:2])) == 3:
-        return True
-    return False
+    if ((np.abs(np.diag(state_grid).sum()) == DIM)
+            |
+            (np.abs(np.diag(state_grid[::-1]).sum()) == DIM)):
+        return np.sign(np.diag(state_grid).sum())
 
-
-@jit(nopython=True)
-def get_actions(state, _):
-    # For Tic Tac Toe, the move doesn't affect which actions are possible
-    # Therefore, we don't need to use it in this function.
-    return [i for i in range(9) if state[i] == 0]
-
-
-@jit(nopython=True)
-def transition(state, action):
-    new_state = state.copy()
-    new_state[action] = 1
-    return new_state
-
-
-@jit(nopython=True)
-def reward(state, is_terminal):
-    if not is_terminal:
-        return 0
-    for i in range(3):
-        if sum(state[i * 3:(i + 1) * 3]) == 3 or sum(state[i::3]) == 3:
-            return 1
-    if sum(state[::4]) == 3 or sum(state[2:8:2]) == 3:
-        return 1
+    # No winner
     return 0
 
 
-#
-# def test_mcts():
-#     initial_state = [0] * 9
-#     initial_action = -1
-#
-#     mcts = pydin.MCTS(
-#         initial_state=initial_state,
-#         initial_action=initial_action,
-#         get_actions=get_actions,
-#         transition=transition,
-#         is_terminal=is_terminal,
-#         reward=reward,
-#     )
-#
-#     # Suppose your MCTS has a method called `best_action` that returns the best action.
-#     # You can then assert that the best action is as expected. Below, we assume that
-#     # the best action for the starting player in an empty tic-tac-toe grid is the middle square.
-#     mcts.execute(10000)
-#     # best_action = mcts.best_action()
-#     time.sleep(1)
-#     print("Hello World")
-#     print("Best Action: ", mcts.best_action())
-#     mcts.print_tree()
-#     assert 4 == 4  # Middle square in 1D list
-#
-#
-# if __name__ == "__main__":
-#     import pytest
-#
-#     raise SystemExit(pytest.main([__file__]))
+@nb.njit(nogil=True)
+def contains_zero(state: NDArray[np.int32]) -> bool:
+    for i in range(state.size - 1):  # Exclude the last element
+        if state[i] == 0:
+            return True
+    return False
 
 
-import pydin
+@nb.njit(nogil=True)
+def is_terminal_fn(state: NDArray[np.int32]) -> bool:
+    if check_winner(state) != 0 or not contains_zero(state):
+        return True
 
-initial_state = [0] * 9
-initial_action = -1
+    return False
 
-mcts = pydin.MCTS(
-    initial_state=initial_state,
-    initial_action=initial_action,
-    get_actions=get_actions,
-    transition=transition,
-    is_terminal=is_terminal,
-    reward=reward)
+
+@nb.njit(nogil=True)
+def get_actions_fn(state: NDArray[np.int32]) -> nb.typed.List[np.int32]:
+    return np.where(state[:-1] == 0)[0]  # Available action, wherever there is a 0
+
+
+@nb.njit(nogil=True)
+def transition_fn(state: NDArray[np.int32],
+                  action: int) -> NDArray[np.int32]:
+    new_state = np.copy(state)
+    new_state[action] = new_state[-1]  # Set the value to the current player's move
+    new_state[-1] = -new_state[-1]  # Switch to the other player
+    return new_state
+
+
+@nb.njit(nogil=True)
+def reward_fn(state: NDArray[np.int32]) -> float:
+    winner: np.int32 = check_winner(state)
+
+    # Count the number of moves taken
+    num_moves = np.count_nonzero(state[:-1])
+
+    # Add a small number to avoid division by zero
+    num_moves = max(num_moves, 1)
+
+    if winner == 1:
+        return 1.0 / num_moves
+    elif winner == -1:
+        return 0.0
+    elif is_terminal_fn(state):
+        return 0.0
+        # return 0.5 / num_moves  # the game is a draw
+
+    return 0.0  # the game is not finished yet
+
+
+if __name__ == "__main__":
+    logger = pydin.logging.ConsoleLogger()
+    logger.set_level(pydin.logging.DEBUG)
+    logger.debug("Starting MCTS test")
+    # print(pydin.__dict__)
+    initial_state = np.concatenate((np.array([0] * (DIM ** 2)), np.array([1])), axis=0)
+    initial_action = -1
+
+    mcts = pydin.MCTS(
+        initial_state=initial_state,
+        initial_action=initial_action,
+        action_generator=get_actions_fn,
+        transition=transition_fn,
+        is_terminal=is_terminal_fn,
+        reward=reward_fn,
+        selection_policy=pydin.EpsilonGreedy(epsilon=0.01),
+        # selection_policy=pydin.UCB1(0.01),
+    )
+
+    # Suppose your MCTS has a method called `best_action` that returns the best action.
+    # You can then assert that the best action is as expected. Below, we assume that
+    # the best action for the starting player in an empty tic-tac-toe grid is the middle square.
+    trajectory = mcts.search(iterations=1000)
+    print(mcts)
+
+    # convert to state, action, reward
+    # s, a, r = zip(*trajectory)
+
+    # Let's print out the actions in the trajectory
+    for state, action, reward in trajectory:
+        # print with X and O
+        state = state[:-1].reshape(DIM, DIM)
+        new_state = np.copy(state).astype(str)
+        new_state[state == 1] = "X"
+        new_state[state == -1] = "O"
+        new_state[state == 0] = "."
+        print(f"State: \n{new_state}, \nAction: {action}, \nReward: {reward}")
+
+    print("complete")

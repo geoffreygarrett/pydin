@@ -13,6 +13,7 @@ build -c opt
 
 #--verbose_failures
 
+test -s
 
 # Set test output to be streamed directly to the console.
 test --test_output=all
@@ -22,13 +23,11 @@ test --test_summary=detailed
 
 #build --action_env=PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/bin:$PATH"
 #build --action_env=PYTHON_BIN_PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/python3.10"
-build --repo_env PYTHON_BIN_PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/bin/python"
+#build --repo_env PYTHON_BIN_PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/bin/python"
 
 
-run --experimental_enable_bzlmod
-build --experimental_enable_bzlmod
-info --experimental_enable_bzlmod
-query --experimental_enable_bzlmod
+common --experimental_enable_bzlmod
+
 
 #--test_output=<summary, errors, all or streamed> default: "summary"
 #Specifies desired output mode. Valid values are 'summary' to output only test status summary,
@@ -48,7 +47,7 @@ query --experimental_enable_bzlmod
 #build --host_cpu=k8
 
 # Enable debug outputs for sandboxing.
-build --sandbox_debug
+#build --sandbox_debug
 #build --copt=-Dredacted='\\\"redacted\\\"'
 
 # Debug test with environment variable for shared libraries.

@@ -1,9 +1,9 @@
 ## extensions.bzl
-load("//:repositories.bzl", "pybind11_dependency")
+load("//:repositories.bzl", "pydin_dependencies")
 load("//:python_configure.bzl", "python_configure")
 
-def _pybind_extension_impl(ctx):
-    pybind11_dependency()
+def _init(ctx):
+    pydin_dependencies()
 
     for mod in ctx.modules:
         for configure in mod.tags.configure:
@@ -21,9 +21,9 @@ def _python_configure():
     })
     return attrs
 
-pybind = module_extension(
+init = module_extension(
     tag_classes = {
         "configure": tag_class(attrs = _python_configure()),
     },
-    implementation = _pybind_extension_impl,
+    implementation = _init,
 )
