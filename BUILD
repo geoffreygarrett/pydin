@@ -167,7 +167,7 @@ py_library(
     data = [
         ":__init__",
         ":core",
-        ":core_stubs",
+        #        ":core_stubs",
     ],
     imports = ["."],
     visibility = ["//visibility:public"],
