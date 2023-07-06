@@ -4,6 +4,7 @@
 
 #include <pydin/bind_astro.hpp>
 #include <pydin/bind_logging.hpp>
+//#include <pydin/bind_gravitation.hpp>
 #include <pydin/bind_mcts.hpp>
 //#include <pydin/bind_omp.hpp>
 
@@ -35,7 +36,7 @@ PYBIND11_MODULE(core, m) {
             state::mixed_integer_program<int, double>,
             Eigen::VectorX<int>>;
 
-    py::class_<StateVariant>(m, "StateVariant")
+    py::class_<StateVariant>(m, "StateVariant", py::module_local())
         .def(py::init<>())
         .def(py::init<state::mixed_integer_program<int, double>>())
         .def(py::init<Eigen::VectorX<int>>())
@@ -83,4 +84,8 @@ PYBIND11_MODULE(core, m) {
 
 
     bind_astrodynamics<double>(m, "");
+
+//    auto m_gravitation = m.def_submodule("gravitation");
+
+//    bind_gravitation<double>(m_gravitation, "");
 }
