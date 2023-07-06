@@ -26,15 +26,15 @@ PYBIND11_MODULE(core, m) {
 #endif
 
 
-    auto m_logging = m.def_submodule("logging");
-    bind_logging(m_logging, "");
+//    auto m_logging = m.def_submodule("logging");
+//    bind_logging(m_logging, "");
 
 //    auto m_mip = m.def_submodule("mip");
 //    auto m_mcts = m.def_submodule("mcts");
 
-    using StateVariant = std::variant<
-            state::mixed_integer_program<int, double>,
-            Eigen::VectorX<int>>;
+//    using StateVariant = std::variant<
+//            state::mixed_integer_program<int, double>,
+//            Eigen::VectorX<int>>;
 
 //    py::class_<StateVariant>(m, "StateVariant", py::module_local())
 //        .def(py::init<>())
@@ -68,14 +68,14 @@ PYBIND11_MODULE(core, m) {
 //        }
 //    });
 
-    bind_mcts<
-//            state::mixed_integer_program<int, double>,// tuple<vector<int>, vector<double>>
-            StateVariant,// tuple<vector<int>, vector<double>>
-            action::single_integer<int>,              // int
-            reward::single_scalar<float>,             // float
-            double>(m, "");
-
+//    bind_mcts<
+////            state::mixed_integer_program<int, double>,// tuple<vector<int>, vector<double>>
+//            StateVariant,// tuple<vector<int>, vector<double>>
+//            action::single_integer<int>,              // int
+//            reward::single_scalar<float>,             // float
+//            double>(m, "");
 //
+////
 //    bind_mcts<
 //            Eigen::VectorX<int>,         // vector<int> (shouldn't be eigen, but I have examples using this rn)
 //            action::single_integer<int>, // int
