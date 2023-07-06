@@ -138,31 +138,60 @@ genrule(
     ],
 )
 
-pkg_zip(
-    name = "pydin-zip",
+genrule(
+    name = "README",
+    outs = ["README.md"],
+    cmd = "echo \"\"\"# pydin\"\"\" > $(OUTS)",
+    tools = [
+        ":black",
+        ":stub_generator",
+    ],
+)
+
+pkg_files(
+    name = "pydin_module",
     srcs = [
         ":__init__",
         ":core",
         ":core_stubs",
     ],
+    prefix = "pydin",
+    visibility = ["//visibility:private"],
+)
+
+pkg_files(
+    name = "environment_files",
+    srcs = [
+        "//:environment.yml",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+PKG_SRCS = [
+    ":README",
+    ":environment_files",
+    ":pydin_module",
+]
+
+PKG_STAMP = 1
+
+PKG_STRIP_PREFIX = strip_prefix.from_pkg("external/pydin")
+
+pkg_zip(
+    name = "pydin-zip",
+    srcs = PKG_SRCS,
     out = "pydin.zip",
-    package_dir = "pydin",
-    stamp = 1,
-    strip_prefix = strip_prefix.from_pkg("external/pydin"),
+    stamp = PKG_STAMP,
+    strip_prefix = PKG_STRIP_PREFIX,
     visibility = ["//visibility:public"],
 )
 
 pkg_tar(
     name = "pydin-tar",
-    srcs = [
-        ":__init__",
-        ":core",
-        ":core_stubs",
-    ],
+    srcs = PKG_SRCS,
     out = "pydin.tar.gz",
-    package_dir = "pydin",
-    stamp = 1,
-    strip_prefix = strip_prefix.from_pkg("external/pydin"),
+    stamp = PKG_STAMP,
+    strip_prefix = PKG_STRIP_PREFIX,
     visibility = ["//visibility:public"],
 )
 
@@ -171,7 +200,7 @@ py_library(
     data = [
         ":__init__",
         ":core",
-        #        ":core_stubs",
+        ":core_stubs",
     ],
     imports = ["."],
     visibility = ["//visibility:public"],
