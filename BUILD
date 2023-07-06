@@ -131,7 +131,11 @@ alias(
 genrule(
     name = "__init__",
     outs = ["__init__.py"],
-    cmd = "echo \"\"\"from .core import *\"\"\" > $(OUTS)",
+    cmd = """
+    OUT_FILE=$$(mktemp)
+    echo "from .core import *" > $${OUT_FILE}
+    mv $${OUT_FILE} $(OUTS)
+    """,
     tools = [
         ":black",
         ":stub_generator",
@@ -141,7 +145,22 @@ genrule(
 genrule(
     name = "README",
     outs = ["README.md"],
-    cmd = "echo \"\"\"# pydin\"\"\" > $(OUTS)",
+    cmd = """
+    OUT_FILE=$$(mktemp)
+    echo "# pydin" > $${OUT_FILE}
+    echo "Python bindings for the Odin library" >> $${OUT_FILE}
+    echo "" >> $${OUT_FILE}
+    echo "## Dependency Installation" >> $${OUT_FILE}
+    echo "```bash" >> $${OUT_FILE}
+    echo "pip install -r requirements.txt" >> $${OUT_FILE}
+    echo "```" >> $${OUT_FILE}
+    echo "## Testing" >> $${OUT_FILE}
+    echo "```bash" >> $${OUT_FILE}
+    echo "python -m pytest" >> $${OUT_FILE}
+    echo "```" >> $${OUT_FILE}
+    echo "" >> $${OUT_FILE}
+    mv $${OUT_FILE} $(OUTS)
+    """,
     tools = [
         ":black",
         ":stub_generator",
@@ -160,9 +179,17 @@ pkg_files(
 )
 
 pkg_files(
+    name = "pydin_tests",
+    srcs = ["//tests:test_files"],
+    prefix = "tests",
+    visibility = ["//visibility:private"],
+)
+
+pkg_files(
     name = "environment_files",
     srcs = [
         "//:environment.yml",
+        "//:requirements.txt",
     ],
     visibility = ["//visibility:private"],
 )
@@ -171,6 +198,7 @@ PKG_SRCS = [
     ":README",
     ":environment_files",
     ":pydin_module",
+    ":pydin_tests",
 ]
 
 PKG_STAMP = 1

@@ -6,6 +6,15 @@ load(
     "requirement",
 )
 
+filegroup(
+    name = "test_files",
+    srcs = [
+        "test_astrodynamics.py",
+        "test_mcts.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 py_test(
     name = "test_astrodynamics",
     srcs = ["test_astrodynamics.py"],
