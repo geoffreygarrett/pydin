@@ -55,22 +55,22 @@ namespace reward {
 
 template<typename State, typename Action, typename Reward, typename Float = double>
 void bind_mcts(py::module &m, const std::string &suffix) {
-
-    using RunningStatsType = RunningStats<double>;
-    py::class_<RunningStatsType>(m, "RunningStats")
-            .def(py::init<bool, bool, bool, bool>(),
-                 "calc_mean"_a = false,
-                 "calc_variance"_a = false,
-                 "calc_min"_a = false,
-                 "calc_max"_a = true)
-            .def("push", &RunningStatsType::push, "value"_a)
-            .def("mean", &RunningStatsType::mean)
-            .def("variance", &RunningStatsType::variance)
-            .def("standard_deviation", &RunningStatsType::standard_deviation)
-            .def("min", &RunningStatsType::min)
-            .def("max", &RunningStatsType::max)
-            .def("count", &RunningStatsType::count)
-            .def("clear", &RunningStatsType::clear);
+//
+//    using RunningStatsType = RunningStats<double>;
+//    py::class_<RunningStatsType>(m, "RunningStats")
+//            .def(py::init<bool, bool, bool, bool>(),
+//                 "calc_mean"_a = false,
+//                 "calc_variance"_a = false,
+//                 "calc_min"_a = false,
+//                 "calc_max"_a = true)
+//            .def("push", &RunningStatsType::push, "value"_a)
+//            .def("mean", &RunningStatsType::mean)
+//            .def("variance", &RunningStatsType::variance)
+//            .def("standard_deviation", &RunningStatsType::standard_deviation)
+//            .def("min", &RunningStatsType::min)
+//            .def("max", &RunningStatsType::max)
+//            .def("count", &RunningStatsType::count)
+//            .def("clear", &RunningStatsType::clear);
 
     //    m.def("test_cpp", &test_cpp<int, double>,
     //          "Test function for MIPState<int, Float>",
