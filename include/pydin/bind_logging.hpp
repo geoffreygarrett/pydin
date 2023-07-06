@@ -1,83 +1,51 @@
 #ifndef BIND_LOGGING_HPP
 #define BIND_LOGGING_HPP
 
-#include <odin/logging.hpp>
-#include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <utility>
+#include <pybind11/functional.h>
+#include <odin/logging.hpp>
 
-// C++ function that logs a message
-void cxx_log(std::string level, std::string msg) {
-    if (level == "INFO") {
-        ODIN_LOG_INFO << msg;
-    } else if (level == "WARNING") {
-        ODIN_LOG_WARNING << msg;
-    } else if (level == "ERROR") {
-        ODIN_LOG_ERROR << msg;
-    } else if (level == "FATAL") {
-        ODIN_LOG_FATAL << msg;
-    }
-};
+namespace py = pybind11;
 
 void bind_logging(py::module &m, const std::string &suffix = "") {
-    using namespace pybind11::literals;
-    namespace py = pybind11;
-    //    m_logging.attr("INFO")    = py::int_(INFO);
-    //    m_logging.attr("WARNING") = py::int_(WARNING);
-    //    m_logging.attr("ERROR")   = py::int_(ERROR);
-    //    m_logging.attr("FATAL")   = py::int_(FATAL);
-    INIT_ODIN_LOGGING("pydin", "./log/pydin.log");
+    using namespace py::literals;
 
-    m.def(
-            "set_log_destination", [](const int level, const char *destination) {
-                ODIN_SET_LOG_DESTINATION(level, destination);
-            },
-            "Set the destination of the logging system", "level"_a, "destination"_a);
+    py::enum_<spdlog::level::level_enum>(m, "LogLevel", py::arithmetic())
+            .value("TRACE", spdlog::level::trace)
+            .value("DEBUG", spdlog::level::debug)
+            .value("INFO", spdlog::level::info)
+            .value("WARN", spdlog::level::warn)
+            .value("ERROR", spdlog::level::err)
+            .value("CRITICAL", spdlog::level::critical)
+            .export_values();
 
-    m.def(
-            "log_info", [](const std::string &msg) {
-                ODIN_LOG_INFO << msg;
-            },
-            "Log an info message", "msg"_a);
+    py::class_<ConsoleLogger>(m, ("ConsoleLogger" + suffix).c_str())
+            .def(py::init<>())
+            .def("debug", &ConsoleLogger::debug < std::string > )
+            .def("info", &ConsoleLogger::info < std::string > )
+            .def("warn", &ConsoleLogger::warn < std::string > )
+            .def("error", &ConsoleLogger::error < std::string > )
+            .def("critical", &ConsoleLogger::critical < std::string > )
+            .def("trace", &ConsoleLogger::trace < std::string > )
+            .def("set_level", &ConsoleLogger::set_level);
 
-    m.def(
-            "log_warning", [](const std::string &msg) {
-                ODIN_LOG_WARNING << msg;
-            },
-            "Log a warning message", "msg"_a);
+    py::class_<FileLogger>(m, ("FileLogger" + suffix).c_str())
+            .def(py::init<const std::string &>())
+            .def("debug", &FileLogger::debug < std::string > )
+            .def("info", &FileLogger::info < std::string > )
+            .def("warn", &FileLogger::warn < std::string > )
+            .def("error", &FileLogger::error < std::string > )
+            .def("critical", &FileLogger::critical < std::string > )
+            .def("trace", &FileLogger::trace < std::string > )
+            .def("set_level", &FileLogger::set_level);
 
-    m.def(
-            "log_error", [](const std::string &msg) {
-                ODIN_LOG_ERROR << msg;
-            },
-            "Log an error message", "msg"_a);
+    m.def("global_console_logger", &global_console_logger, py::return_value_policy::reference);
+    m.def("global_file_logger", &global_file_logger, py::return_value_policy::reference);
 
-    m.def(
-            "log_fatal", [](const std::string &msg) {
-                ODIN_LOG_FATAL << msg;
-            },
-            "Log a fatal message", "msg"_a);
-
-    m.def(
-            "set_vlog_level", [](int level) {
-                ODIN_SET_VLOG_LEVEL(level);
-            },
-            "Set the verbosity level of the logging system", "level"_a);
-
-    m.def(
-            "vlog", [](int level, const std::string &msg) {
-                ODIN_VLOG(level) << msg;
-            },
-            "Log a message with a verbosity level", "level"_a, "msg"_a);
-
-
-    // Register it with the Python logger
-    py::module logging      = py::module::import("logging");
-    logging.attr("info")    = py::cpp_function([](std::string msg) { cxx_log("INFO", std::move(msg)); });
-    logging.attr("warning") = py::cpp_function([](std::string msg) { cxx_log("WARNING", std::move(msg)); });
-    logging.attr("error")   = py::cpp_function([](std::string msg) { cxx_log("ERROR", std::move(msg)); });
-    logging.attr("fatal")   = py::cpp_function([](std::string msg) { cxx_log("FATAL", std::move(msg)); });
+    py::class_<VLogger>(m, ("VLogger" + suffix).c_str())
+            .def(py::init<int>())
+            .def("set_verbosity", &VLogger::set_verbosity)
+            .def("get_verbosity", &VLogger::get_verbosity);
 }
 
-#endif// BIND_LOGGING_HPP
+#endif //BIND_LOGGING_HPP
