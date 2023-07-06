@@ -146,6 +146,8 @@ pkg_zip(
         ":core_stubs",
     ],
     out = "pydin.zip",
+    package_dir = "pydin",
+    stamp = 1,
     strip_prefix = strip_prefix.from_pkg("external/pydin"),
     visibility = ["//visibility:public"],
 )
@@ -158,6 +160,8 @@ pkg_tar(
         ":core_stubs",
     ],
     out = "pydin.tar.gz",
+    package_dir = "pydin",
+    stamp = 1,
     strip_prefix = strip_prefix.from_pkg("external/pydin"),
     visibility = ["//visibility:public"],
 )
