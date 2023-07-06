@@ -143,7 +143,7 @@ pkg_zip(
     srcs = [
         ":__init__",
         ":core",
-        #        ":core_stubs",
+        ":core_stubs",
     ],
     out = "pydin.zip",
     strip_prefix = strip_prefix.from_pkg("external/pydin"),
