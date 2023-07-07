@@ -6,6 +6,14 @@ load(
     "requirement",
 )
 
+filegroup(
+    name = "example_files",
+    srcs = [
+        "model_gravitation_ellipsoidal.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 py_binary(
     name = "orbit_plot",
     srcs = ["orbit_plot.py"],

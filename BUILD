@@ -151,13 +151,17 @@ genrule(
     echo "Python bindings for the Odin library" >> $${OUT_FILE}
     echo "" >> $${OUT_FILE}
     echo "## Dependency Installation" >> $${OUT_FILE}
-    echo "```bash" >> $${OUT_FILE}
+    echo "\\`\\`\\`bash" >> $${OUT_FILE}
     echo "pip install -r requirements.txt" >> $${OUT_FILE}
-    echo "```" >> $${OUT_FILE}
+    echo "\\`\\`\\`" >> $${OUT_FILE}
     echo "## Testing" >> $${OUT_FILE}
-    echo "```bash" >> $${OUT_FILE}
+    echo "\\`\\`\\`bash" >> $${OUT_FILE}
     echo "python -m pytest" >> $${OUT_FILE}
-    echo "```" >> $${OUT_FILE}
+    echo "\\`\\`\\`" >> $${OUT_FILE}
+    echo "## Examples" >> $${OUT_FILE}
+    echo "\\`\\`\\`bash" >> $${OUT_FILE}
+    echo "python -m examples.<example_filename>" >> $${OUT_FILE}
+    echo "\\`\\`\\`" >> $${OUT_FILE}
     echo "" >> $${OUT_FILE}
     mv $${OUT_FILE} $(OUTS)
     """,
@@ -186,6 +190,13 @@ pkg_files(
 )
 
 pkg_files(
+    name = "pydin_examples",
+    srcs = ["//examples:example_files"],
+    prefix = "examples",
+    visibility = ["//visibility:private"],
+)
+
+pkg_files(
     name = "environment_files",
     srcs = [
         "//:environment.yml",
@@ -197,6 +208,7 @@ pkg_files(
 PKG_SRCS = [
     ":README",
     ":environment_files",
+    ":pydin_examples",
     ":pydin_module",
     ":pydin_tests",
 ]
