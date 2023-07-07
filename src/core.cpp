@@ -4,7 +4,7 @@
 
 #include <pydin/bind_astro.hpp>
 #include <pydin/bind_logging.hpp>
-//#include <pydin/bind_gravitation.hpp>
+#include <pydin/bind_gravitation.hpp>
 #include <pydin/bind_mcts.hpp>
 //#include <pydin/bind_omp.hpp>
 
@@ -91,7 +91,17 @@ PYBIND11_MODULE(core, m) {
 
     bind_astrodynamics<double>(m, "");
 
-//    auto m_gravitation = m.def_submodule("gravitation");
+    auto m_gravitation = m.def_submodule("gravitation");
 
-//    bind_gravitation<double>(m_gravitation, "");
+    // docs for gravitation submodule
+    m_gravitation.doc() = R"pbdoc(
+        Gravitation submodule
+        ---------------------
+        .. currentmodule:: gravitation
+        .. autosummary::
+           :toctree: _generate
+           gravitation
+    )pbdoc";
+
+    bind_gravitation<double>(m_gravitation, "");
 }

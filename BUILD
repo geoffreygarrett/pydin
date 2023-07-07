@@ -78,7 +78,7 @@ pybind_library(
         #        "@com_github_google_glog//:glog",
         "@com_github_oneapi_onetbb//:tbb",
         "@com_github_uscilab_cereal//:cereal",
-        #        "@org_gnu_gsl//:gsl",
+        "@org_gnu_gsl//:gsl",
         "@odin",
     ],
 )
@@ -244,6 +244,6 @@ py_binary(
         requirement("numpy"),
         requirement("pandas"),
         requirement("numba"),
-        requirement("llvmlite"),
+        requirement("matplotlib"),
     ],
 )

@@ -1,153 +1,142 @@
-# import pytest
-import numpy as np
+from pydin.core.gravitation import TriAxialEllipsoid
 import pydin
-import os
-from llvmlite import binding
-import numba
-
-# load the library into LLVM
-path = os.path.abspath(pydin.core.__file__)
-binding.load_library_permanently(path)
-from numba.experimental import jitclass
+import pydin.core.logging as pdlog
 import numpy as np
-
-state_test = (
-    np.array([0, 1], dtype=np.int32),
-    np.array([0.5, 0.75, 200.0], dtype=np.float64)
-)
-
-from numba import types, int32, float64
-# from numba.types import Tuple
-from typing import Tuple
-
-# Specifying the data layout for the jitclass
-spec = [
-    ('raw_state', types.Tuple([types.Array(int32, 1, 'C'), types.Array(float64, 1, 'C')])),
-]
+# Plot the results
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
 
 
-@jitclass(spec)
-class MIPState:
-    def __init__(self, raw_state: types.Tuple([types.Array(int32, 1, 'C'), types.Array(float64, 1, 'C')])):
-        self.raw_state = raw_state
+def test_tri_axial_ellipsoid():
+    pdlog.set_level(pdlog.DEBUG)
+    pdlog.info("Starting tri-axial ellipsoid example")
 
-    @staticmethod
-    def from_state(raw_state: types.Tuple([types.Array(int32, 1, 'C'), types.Array(float64, 1, 'C')])):
-        return MIPState(raw_state)
+    # Parameters for the Tri-axial Ellipsoid gravitational model
+    a = 300.0
+    b = 200.0
+    c = 100.0
+    rho = 2.8 * 1000.0
+    G = 6.67408 * 1e-11
+    mu = 4.0 / 3.0 * np.pi * G * rho * a * b * c
 
-    def integer(self):
-        return self.raw_state[0]
-
-    def continuous(self):
-        return self.raw_state[1]
-
-    def to_raw(self):
-        return self.raw_state
+    # Initialize the gravitational model
+    gravity = TriAxialEllipsoid(a, b, c, mu)
+    # gravity = HollowSphere(np.sqrt(a ** 2 + b ** 2 + c ** 2), mu)
 
 
-spec2 = [
-    ('mip_state', MIPState.class_type.instance_type),
-]
+    # Create grid of points
+    limit = 1000.0
+    n = 1000
+    x = np.linspace(-limit, limit, n)
+    y = np.linspace(-limit, limit, n)
+    z = np.array([0.0])
 
-from numba.types import Tuple
+    # Create the meshgrid
+    X, Y, Z = np.meshgrid(x, y, z)
 
+    # Compute the potential resulting from the gravitational model
+    timer_name = "Gravitational potential calculation"
+    pdlog.start_timer(timer_name)
+    U = gravity.calculate_potentials(X, Y, Z)
+    pdlog.stop_timer(timer_name)
 
-@jitclass(spec2)
-class Step1State:
-    def __init__(self, raw_state: types.Tuple([types.Array(int32, 1, 'C'), types.Array(float64, 1, 'C')])):
-        self.mip_state = MIPState(raw_state)
+    # # Compute the potential resulting from the gravitational model
+    # potential_vectorized = np.vectorize(gravity.potential, signature='(n)->()')
+    # pdlog.start_timer("Vectorized potential calculation")
+    # U_vectorized = potential_vectorized(np.dstack([X, Y, Z]))
+    # pdlog.stop_timer("Vectorized potential calculation")
 
-    def integer(self):
-        return self.mip_state.integer()
+    # Create the contour plot
+    plt.figure(figsize=(10, 10), dpi=300)
+    plt.contourf(X[:, :, 0], Y[:, :, 0], U[:, :, 0])
 
-    def continuous(self):
-        return self.mip_state.continuous()
+    # Plot ellipsoid patch
+    ellipse = Ellipse(xy=(0, 0), width=2 * a, height=2 * b, angle=0, edgecolor='k', fc='None', lw=2, ls='--')
+    plt.gca().add_patch(ellipse)
 
-    def to_raw(self):
-        return self.mip_state.to_raw()
+    # Set the aspect ratio to 'equal'
+    plt.gca().set_aspect('equal')
 
-    @property
-    def epoch_mjd(self):
-        return self.mip_state.continuous()[0]
+    # Customize the plot
+    plt.title('Gravitational potential on X-Y plane at Z={}'.format(0.0))
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.savefig('gravitational_potential.png', dpi=300)
 
-
-state = Step1State(
-    (
-        np.array([0, 1], dtype=np.int32),
-        np.array([0.5, 0.75, 200.0], dtype=np.float64)
-    ))
-
-
-@numba.njit()
-def test_python1(state: types.Tuple([types.Array(int32, 1, 'C'), types.Array(float64, 1, 'C')])):
-    for i in range(state[0].size):
-        print("integer[", i, "]:", state[0][i])
-    for i in range(state[1].size):
-        print("continuous[", i, "]:", state[1][i])
-    print("int_size: ", state[0].size)
-    print("continuous_size: ", state[1].size)
-
-
-#
-# @numba.njit()
-# def test_python2(state: Tuple[np.ndarray[np.int32], np.ndarray[np.float64]]):
-#     m_state = Step1State(state)
-#     for i in range(m_state.integer().size):
-#         print("integer[", i, "]:", m_state.integer()[i])
-#     for i in range(m_state.continuous().size):
-#         print("continuous[", i, "]:", m_state.continuous()[i])
-#     print("int_size: ", m_state.integer().size)
-#     print("continuous_size: ", m_state.continuous().size)
-#
-#
-import time
+    # Goodbye :)
+    pdlog.info("Finished tri-axial ellipsoid example, goodbye!")
 
 
-#
+from matplotlib.animation import FuncAnimation
 
-def time_test_performance(func):
-    start_time = time.time()
-    func()
-    end_time = time.time()
-    return end_time - start_time
+# Initialize contour levels with None
+contour_levels = None
 
 
-#
-# @numba.njit()
-# def test_performance1():
-#     pass
-#
-#
-# @numba.njit()
-# def test_performance2():
-#     for i in range(10000000):
-#         state_test = (
-#             (0, 1),
-#             (0.5, 0.75, 200.0)
-#         )
-#         m_state = Step1State(state_test)
-#         x = m_state.epoch_mjd - 1.0
-#
-#
-# @numba.njit()
-# def test_performance3():
-#     for i in range(10000000):
-#         state_test = (
-#             (0, 1),
-#             (0.5, 0.75, 200.0)
-#         )
-#         x = state_test[0][0] - 1.0
-#
-#
-# print("test_performance")
-# print(time_test_performance(test_performance1))
-# print(time_test_performance(test_performance2))
-# print(time_test_performance(test_performance3))
-# print()
+# Update function for the animation
+# Update function for the animation
+def update_fig(i, a_values, b_values, c_values, mu_values, X, Y, Z, ax):
+    global contour_levels  # Use the global contour_levels variable
 
-test_python1(state_test)
-pydin.test_cpp(state_test)
-pydin.test_cpp(state.to_raw())
+    ax.clear()
+    a = a_values[i]
+    b = b_values[i]
+    c = c_values[i]
+    mu = mu_values[i]
 
-print(state.epoch_mjd)
-import timeit
+    gravity = TriAxialEllipsoid(a_values[i], b_values[i], c_values[i], mu_values[i])
+    potential_vectorized = np.vectorize(gravity.potential, signature='(n)->()')
+    U = potential_vectorized(np.dstack([X, Y, Z]))
+    del gravity
+    # U = gravity.calculate_potentials(X, Y, Z)
+    # del gravity
+
+    ax.clear()
+    ax.set_aspect('equal')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+
+    # Compute contour levels if it's the first frame
+    if contour_levels is None:
+        U_range = np.max(U) - np.min(U)
+        contour_levels = np.linspace(np.min(U) - 0.5 * U_range, np.max(U) + 0.3 * U_range, 20)  # For example, 20 levels
+
+    # Use stored contour levels
+    ax.contourf(X[:, :, 0], Y[:, :, 0], U[:, :], levels=contour_levels)
+
+    # ensure a > b
+    if a < b:
+        a, b = b, a
+
+    ellipse = Ellipse(xy=(0, 0), width=2 * a, height=2 * b, angle=0, edgecolor='k', fc='None', lw=2, ls='--')
+    ax.add_patch(ellipse)
+
+
+# Tri axial ellipsoid animation function
+def tri_axial_ellipsoid_animation():
+    rho = 2.8 * 1000.0
+    G = 6.67408 * 1e-11
+    limit = 1000.0
+    n = 200
+    x = np.linspace(-limit, limit, n)
+    y = np.linspace(-limit, limit, n)
+    z = np.array([0.0])
+    X, Y, Z = np.meshgrid(x, y, z)
+    a_values = np.linspace(300.0, 100.0, 100)
+    b_values = np.linspace(100.0, 300.0, 100)
+    c_values = np.ones_like(a_values) * 100.0
+    mu_values = 4.0 / 3.0 * np.pi * G * rho * a_values * b_values * c_values
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.set_aspect('equal')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+
+    ani = FuncAnimation(fig, update_fig, frames=len(a_values),
+                        fargs=(a_values, b_values, c_values, mu_values, X, Y, Z, ax), blit=False, interval=50)
+    ani.save('gravitational_potential.gif', writer='pillow')
+    plt.close(fig)
+
+
+if __name__ == '__main__':
+    tri_axial_ellipsoid_animation()
