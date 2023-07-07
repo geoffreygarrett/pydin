@@ -6,30 +6,58 @@
 *~
 __pycache__/
 
-# Bazel build
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.ipa
+*.dll
+
+# Bazel build files
 /bazel-*
 *.runfiles/
-.clwb/
-*.bazelproject/
 
-# Pybind specific
-*.so
-*.pyd
+# CMake Files
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+cmake_install.cmake
+CTestTestfile.cmake
+_install_manifest.txt
+compile_commands.json
+Makefile
+*.cmake
 
-# virtual environment
-env/
-venv/
-*.venv
-.venv/
-.clwb/.bazelproject
-.clwb/.project-data-dir.iml
-.clwb/.workspace.iml
-
-# IDEs and text editors
+# IDE specific files
+# VSCode
 .vscode/
+# CLion
+.clwb/
+# IntelliJ / PyCharm
 .idea/
-*.swp
-*.swo
 
 # Logs and databases
 *.log
@@ -42,4 +70,3 @@ venv/
 .Trashes
 ehthumbs.db
 Thumbs.db
-.clwb
