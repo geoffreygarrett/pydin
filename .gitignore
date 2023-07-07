@@ -10,6 +10,7 @@ __pycache__/
 /bazel-*
 *.runfiles/
 .clwb/
+*.bazelproject/
 
 # Pybind specific
 *.so
