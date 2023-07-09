@@ -4,7 +4,9 @@
 
 #include <pydin/bind_astro.hpp>
 #include <pydin/bind_logging.hpp>
+#ifdef ODIN_USE_GSL
 #include <pydin/bind_gravitation.hpp>
+#endif
 #include <pydin/bind_mcts.hpp>
 //#include <pydin/bind_omp.hpp>
 
@@ -102,6 +104,7 @@ PYBIND11_MODULE(core, m) {
            :toctree: _generate
            gravitation
     )pbdoc";
-
+#ifdef ODIN_USE_GSL
     bind_gravitation<double>(m_gravitation, "");
+#endif
 }

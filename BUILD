@@ -8,6 +8,30 @@ load(
     "requirement",
 )
 
+#string_flag(
+#    name = "gsl_library",
+#    default = "enabled",
+#    doc = "Configuration to use gsl library",
+#    values = [
+#        "enabled",
+#        "disabled",
+#    ],
+#)
+
+#config_setting(
+#    name = "without_gsl",
+#    flag_values = {gsl_library: "disabled"},
+#)
+
+# without gsl for windows and mac
+#config_setting(
+#    name = "without_gsl",
+#    flag_values = {
+#        "@platforms//os:windows": "disabled",
+#        "@platforms//os:osx": "disabled",
+#    },
+#)
+
 platform(
     name = "x64_windows-clang-cl",
     constraint_values = [
@@ -78,15 +102,35 @@ pybind_library(
         #        "@com_github_google_glog//:glog",
         "@com_github_oneapi_onetbb//:tbb",
         "@com_github_uscilab_cereal//:cereal",
-        "@org_gnu_gsl//:gsl",
         "@odin",
-    ],
+    ] + select({
+        "@platforms//os:osx": [
+            #            "@org_gnu_gsl//:gsl",
+        ],
+        "@platforms//os:windows": [
+            #            "@org_gnu_gsl//:gsl",
+        ],
+        "//conditions:default": [
+            "@org_gnu_gsl//:gsl",
+        ],
+    }),
 )
 
 pybind_extension(
     name = "core",
     srcs = ["src/core.cpp"],
     copts = CORE_COPTS,
+    defines = select({
+        "@platforms//os:osx": [
+            #            "ODIN_USE_GSL",
+        ],
+        "@platforms//os:windows": [
+            #            "ODIN_USE_GSL",
+        ],
+        "//conditions:default": [
+            "ODIN_USE_GSL",
+        ],
+    }),
     #    defines = [
     #        "CORE_VERSION_INFO=\"0.1.0\"",
     #    ],

@@ -1,3 +1,7 @@
+"""
+NOTE: This example requires GSL, and as such, it is currently not supported by Windows and masOS.
+ See https://github.com/geoffreygarrett/pydin/issues/1 for more information.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
