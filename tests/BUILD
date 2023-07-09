@@ -32,6 +32,37 @@ py_test(
 )
 
 py_test(
+    name = "test_gravitation",
+    srcs = ["test_gravitation.py"],
+    args = [
+        "--junit-xml=test_astrodynamics.xml",
+        "-v",
+    ],
+    python_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:pydin",
+        requirement("pytest"),
+        requirement("numpy"),
+    ],
+)
+
+py_test(
+    name = "test_tbb",
+    srcs = ["test_tbb.py"],
+    args = [
+        "--junit-xml=test_astrodynamics.xml",
+        "-v",
+    ],
+    python_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:pydin",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
     name = "test_mcts",
     srcs = ["test_mcts.py"],
     args = [

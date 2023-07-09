@@ -26,6 +26,17 @@ py_binary(
 )
 
 py_binary(
+    name = "model_gravitation_ellipsoidal",
+    srcs = ["model_gravitation_ellipsoidal.py"],
+    python_version = "PY3",
+    deps = [
+        requirement("numpy"),
+        requirement("matplotlib"),
+        "//:pydin",
+    ],
+)
+
+py_binary(
     name = "main",
     srcs = ["main.py"],
     python_version = "PY3",
