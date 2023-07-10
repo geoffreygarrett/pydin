@@ -13,9 +13,6 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-#define ARG_ANGLE py::arg("angle")
-#define ARG_GM py::arg("mu")
-
 PYBIND11_MODULE(core, m) {
 
 // auto m_omp = m.def_submodule("omp");

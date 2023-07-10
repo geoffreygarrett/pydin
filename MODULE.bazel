@@ -1,17 +1,44 @@
 # MODULE.bazel
 module(name = "pydin", repo_name = "com_github_geoffreygarrett_pydin", version = "0.1.0")
 
-bazel_dep(name = "odin", version = "0.1.0")
 git_override(
     module_name = "rules_foreign_cc",
     remote = "https://github.com/bazelbuild/rules_foreign_cc",
     commit = "26c77008307c80a90fabc8fe3f7a72b961120a84",
 )
+bazel_dep(name = "odin", version = "0.1.0")
+tools = use_extension("@rules_foreign_cc//foreign_cc:extensions.bzl", "tools")
+
+use_repo(
+    tools,
+    "cmake_3.23.2_toolchains",
+    "cmake_src",
+    "gnumake_src",
+    "meson_src",
+    "ninja_1.11.1_toolchains",
+    "ninja_build_src",
+    "pkgconfig_src",
+    "rules_foreign_cc_framework_toolchains",
+)
+
+register_toolchains(
+    "@rules_foreign_cc_framework_toolchains//:all",
+    "@rules_foreign_cc//toolchains:built_meson_toolchain",
+    "@rules_foreign_cc//toolchains:preinstalled_pkgconfig_toolchain",
+    "@rules_foreign_cc//toolchains:built_ninja_toolchain",
+    "@rules_foreign_cc//toolchains:preinstalled_make_toolchain",
+    "@rules_foreign_cc//toolchains:preinstalled_cmake_toolchain",
+    "@rules_foreign_cc//toolchains:preinstalled_autoconf_toolchain",
+    "@rules_foreign_cc//toolchains:preinstalled_automake_toolchain",
+    "@rules_foreign_cc//toolchains:preinstalled_m4_toolchain",
+    "@cmake_3.23.2_toolchains//:all",
+    "@ninja_1.11.1_toolchains//:all",
+)
 
 local_path_override(module_name = "odin", path = "../odin")
 
 bazel_dep(name = "rules_pkg", version = "0.9.1")
-bazel_dep(name = "glog", version = "0.5.0")
+#bazel_dep(name = "glog", version = "0.5.0")
 
 # RULES PYTHON ##########################################################
 bazel_dep(name = "rules_python", version = "0.23.1")
@@ -55,7 +82,7 @@ pybind11 = use_extension("@pybind11_bazel//extensions/python:configure.bzl", "py
 pybind11.configure(
     name = "local_config_python",
     python_version = "3",
-    python_interpreter_target = interpreter,
+    #    python_interpreter_target = interpreter,
 )
 
 use_repo(pybind11, "pybind11", "local_config_python")
@@ -63,7 +90,7 @@ use_repo(pybind11, "pybind11", "local_config_python")
 #        "python_version": attr.string(default=""),
 #        "python_interpreter_target": attr.label(),
 
-odin_deps = use_extension("@odin//extensions:deps.bzl", "odin_deps")
+odin_deps = use_extension("@odin//:extensions.bzl", "init")
 use_repo(
     odin_deps,
     "com_github_uscilab_cereal",
@@ -71,6 +98,7 @@ use_repo(
     #    "com_github_bluebrain_highfive",
     #    "com_github_hdfgroup_hdf5",
     "com_github_google_glog",
+    "rules_foreign_cc",
     "org_gnu_gsl",
     #    "com_github_eigen_eigen",
 )
