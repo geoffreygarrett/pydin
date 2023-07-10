@@ -1,27 +1,39 @@
 """
 NOTE: This example requires GSL, and as such, it is currently not supported by Windows and masOS.
- See https://github.com/geoffreygarrett/pydin/issues/1 for more information.
+See https://github.com/geoffreygarrett/pydin/issues/1 for more information.
 """
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from pydin.core.gravitation import TriAxialEllipsoid
 import pydin.core.logging as pdlog
-import pydin.core.tbb as tbb
 
 
-def initialize_gravity(a, b, c, rho):
+class ModelParams:
+    """Class for managing model parameters."""
+
+    def __init__(self, a, b, c, rho, limit, n, z):
+        self.a = a
+        self.b = b
+        self.c = c
+        self.rho = rho
+        self.limit = limit
+        self.n = n
+        self.z = z
+
+
+def initialize_gravity(params):
     """Initializes the gravitational model."""
     G = 6.67408 * 1e-11
-    mu = 4.0 / 3.0 * np.pi * G * rho * a * b * c
-    return TriAxialEllipsoid(a, b, c, mu)
+    mu = 4.0 / 3.0 * np.pi * G * params.rho * params.a * params.b * params.c
+    return TriAxialEllipsoid(params.a, params.b, params.c, mu)
 
 
-def create_meshgrid(limit, n, z=0.0):
+def create_meshgrid(params):
     """Creates a meshgrid for the x, y, z coordinates."""
-    x = np.linspace(-limit, limit, n)
-    y = np.linspace(-limit, limit, n)
-    return np.meshgrid(x, y, np.array([z]))
+    x = np.linspace(-params.limit, params.limit, params.n)
+    y = np.linspace(-params.limit, params.limit, params.n)
+    return np.meshgrid(x, y, np.array([params.z]))
 
 
 def calculate_potential(gravity, X, Y, Z):
@@ -33,16 +45,17 @@ def calculate_potential(gravity, X, Y, Z):
     return U
 
 
-def create_contour_plot(X, Y, U, a, b, filename='gravitational_potential.png'):
+def create_contour_plot(X, Y, U, params, filename='gravitational_potential.png'):
     """Creates a contour plot and saves it to a file."""
     plt.figure(figsize=(10, 10), dpi=300)
     plt.contourf(X[:, :, 0], Y[:, :, 0], U[:, :, 0])
 
-    ellipse = Ellipse(xy=(0, 0), width=2 * a, height=2 * b, angle=0, edgecolor='k', fc='None', lw=2, ls='--')
+    ellipse = Ellipse(
+        xy=(0, 0), width=2 * params.a, height=2 * params.b, angle=0, edgecolor='k', fc='None', lw=2, ls='--')
     plt.gca().add_patch(ellipse)
     plt.gca().set_aspect('equal')
 
-    plt.title('Gravitational potential on X-Y plane at Z={}'.format(0.0))
+    plt.title('Gravitational potential on X-Y plane at Z={}'.format(params.z))
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.savefig(filename, dpi=300)
@@ -52,23 +65,20 @@ def run_example():
     pdlog.set_level(pdlog.DEBUG)
     pdlog.info("Starting tri-axial ellipsoid example")
 
-    # Define parameters
-    a, b, c = 300.0, 200.0, 100.0
-    rho = 2.8 * 1000.0
+    # Initialize parameters
+    params = ModelParams(a=300.0, b=200.0, c=100.0, rho=2.8 * 1000.0, limit=1000.0, n=1000, z=0.0)
 
     # Initialize gravitational model
-    gravity = initialize_gravity(a, b, c, rho)
+    gravity = initialize_gravity(params)
 
     # Create meshgrid
-    X, Y, Z = create_meshgrid(1000.0, 3000)
+    X, Y, Z = create_meshgrid(params)
 
     # Calculate potential
-    with tbb.TBBControl() as tbb_ctrl:
-        tbb_ctrl.max_allowed_parallelism = tbb.hardware_concurrency()
-        U = calculate_potential(gravity, X, Y, Z)
+    U = calculate_potential(gravity, X, Y, Z)
 
     # Create contour plot
-    create_contour_plot(X, Y, U, a, b)
+    create_contour_plot(X, Y, U, params)
 
     pdlog.info("Finished tri-axial ellipsoid example, goodbye!")
 

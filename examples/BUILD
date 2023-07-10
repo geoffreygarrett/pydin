@@ -37,6 +37,28 @@ py_binary(
 )
 
 py_binary(
+    name = "basic_triaxial_ellipsoid_example",
+    srcs = ["basic_triaxial_ellipsoid_example.py"],
+    python_version = "PY3",
+    deps = [
+        requirement("numpy"),
+        requirement("matplotlib"),
+        "//:pydin",
+    ],
+)
+
+py_binary(
+    name = "advanced_triaxial_ellipsoid_tbb_example",
+    srcs = ["advanced_triaxial_ellipsoid_tbb_example.py"],
+    python_version = "PY3",
+    deps = [
+        requirement("numpy"),
+        requirement("matplotlib"),
+        "//:pydin",
+    ],
+)
+
+py_binary(
     name = "main",
     srcs = ["main.py"],
     python_version = "PY3",

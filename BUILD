@@ -8,6 +8,7 @@ load(
     "requirement",
 )
 
+exports_files(["MODULE.bazel"])
 #string_flag(
 #    name = "gsl_library",
 #    default = "enabled",

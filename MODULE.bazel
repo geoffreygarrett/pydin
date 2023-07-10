@@ -17,19 +17,21 @@ bazel_dep(name = "glog", version = "0.5.0")
 bazel_dep(name = "rules_python", version = "0.23.1")
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+
+# The default toolchain to use if nobody configures a toolchain.
+# NOTE: This is not a stable version. It is provided for convenience, but will
+# change frequently to track the most recent Python version.
+# NOTE: The root module can override this.
 python.toolchain(
     is_default = True,
     python_version = "3.10",
 )
 
-#load("@rules_python//python:repositories.bzl", "python_register_toolchains")
-#
-#python_register_toolchains(
-#    name = "python3_10",
-#    python_version = "3.10",
-#)
+use_repo(python, "pythons_hub")
 
-#
+# This call registers the Python toolchains.
+register_toolchains("@pythons_hub//:all")
+
 #load("@python3_10//:defs.bzl", "interpreter")`
 interpreter = use_extension("@rules_python//python/extensions:interpreter.bzl", "interpreter")
 interpreter.install(
@@ -52,8 +54,8 @@ local_path_override(
 pybind11 = use_extension("@pybind11_bazel//extensions/python:configure.bzl", "pybind11")
 pybind11.configure(
     name = "local_config_python",
-    #    python_version = "3",
-    #    python_interpreter_target = interpreter,
+    python_version = "3",
+    python_interpreter_target = interpreter,
 )
 
 use_repo(pybind11, "pybind11", "local_config_python")
@@ -69,6 +71,7 @@ use_repo(
     #    "com_github_bluebrain_highfive",
     #    "com_github_hdfgroup_hdf5",
     "com_github_google_glog",
+    "org_gnu_gsl",
     #    "com_github_eigen_eigen",
 )
 
