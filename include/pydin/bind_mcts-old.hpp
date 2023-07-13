@@ -28,6 +28,23 @@ namespace reward {
     using single_scalar = Float;
 }
 
+//
+//template<typename State, typename Action, typename Reward>
+//std::unique_ptr<Node<State, Action, Reward>>
+//deep_copy_node(const Node<State, Action, Reward> &node) {
+//    auto copied_node   = std::make_unique<Node<State, Action, Reward>>();
+//    copied_node->state = node.state;
+//    copied_node->parent
+//            = nullptr;// the parent will be set when the child is added to the parent node
+//    copied_node->children.clear();// ensure the children vector is empty
+//    for (const auto &child: node.children) {
+//        auto copied_child    = deep_copy_node(*child);
+//        copied_child->parent = copied_node.get();// set the parent pointer
+//        copied_node->children.push_back(std::move(copied_child));
+//    }
+//    return copied_node;
+//}
+
 template<typename State, typename Action, typename Reward, typename Float = double>
 void bind_mcts(py::module &m, const std::string &suffix = "") {
 
@@ -70,6 +87,36 @@ void bind_mcts(py::module &m, const std::string &suffix = "") {
             .DECLARE_BINARY_PICKLING(py_node_type)
             .DECLARE_IO_FUNCTIONS(py_node_type);
 
+    using node_type = Node<State, Action, Reward>;
+
+    //    py::class_<node_type, std::shared_ptr<node_type>>(m, ("Node" + suffix).c_str())
+    //            .def(py::init<const State, const std::optional<Action>>(),
+    //                 "state"_a,
+    //                 "action"_a = std::nullopt)
+    //            .def("get_children",
+    //                 [](const node_type &self) -> py::object {
+    //                     std::vector<std::unique_ptr<node_type>> copied_children;
+    //                     for (const auto &child: self.children) {
+    //                         copied_children.push_back(deep_copy_node(*child));
+    //                     }
+    //                     return py::cast(copied_children);
+    //                 })
+    //            .def("get_parent",
+    //                 [](node_type &self) -> py::object {
+    //                     if (self.parent != nullptr) {
+    //                         return py::cast(deep_copy_node(*self.parent));
+    //                     } else {
+    //                         return py::none();
+    //                     }
+    //                 })
+    //            .def_readonly("is_leaf", &node_type::is_leaf)
+    //            .def_readonly("state", &node_type::state)
+    //            .def_readonly("action", &node_type::action)
+    //            .def_readonly("reward_stats", &node_type::reward_stats)
+    //            .def_readonly("is_terminal", &node_type::is_terminal);
+    //            .DECLARE_REPR(node_type)
+    //            .DECLARE_BINARY_PICKLING(node_type)
+    //            .DECLARE_IO_FUNCTIONS(node_type);
 
     using selection_policy = typename MCTS<State, Action, Reward, Float>::fn_selection_policy;
     using state_transition = typename MCTS<State, Action, Reward, Float>::fn_state_transition;
@@ -78,9 +125,9 @@ void bind_mcts(py::module &m, const std::string &suffix = "") {
     using reward           = typename MCTS<State, Action, Reward, Float>::fn_reward;
     using node_type        = Node<State, Action, Reward>;
 
-    // Bind the CppNode class
-    py::class_<node_type>(m, ("CppNode" + suffix).c_str())
-            .def_readonly("reward_stats", &node_type::reward_stats);
+    //    // Bind the CppNode class
+    //    py::class_<node_type>(m, ("CppNode" + suffix).c_str())
+    //            .def_readonly("reward_stats", &node_type::reward_stats);
 
     using value_estimator_type = typename SelectionPolicy<node_type, Float>::value_estimator_type;
 

@@ -8,6 +8,7 @@ from matplotlib.patches import Ellipse
 from pydin.core.gravitation import TriAxialEllipsoid
 import pydin.core.logging as pdlog
 import pydin.core.tbb as tbb
+import pydin as pd
 
 
 def initialize_gravity(a, b, c, rho):

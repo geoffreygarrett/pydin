@@ -2,11 +2,11 @@
 NOTE: This example requires GSL, and as such, it is currently not supported by Windows and masOS.
  See https://github.com/geoffreygarrett/pydin/issues/1 for more information.
 """
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pydin.core.logging as pdlog
 from matplotlib.patches import Ellipse
 from pydin.core.gravitation import TriAxialEllipsoid
-import pydin.core.logging as pdlog
 
 
 def initialize_gravity(a, b, c, rho):
@@ -32,18 +32,27 @@ def calculate_potential(gravity, X, Y, Z):
     return U
 
 
-def create_contour_plot(X, Y, U, a, b, filename='gravitational_potential.png'):
+def create_contour_plot(X, Y, U, a, b, filename="gravitational_potential.png"):
     """Creates a contour plot and saves it to a file."""
     plt.figure(figsize=(10, 10), dpi=300)
     plt.contourf(X[:, :, 0], Y[:, :, 0], U[:, :, 0])
 
-    ellipse = Ellipse(xy=(0, 0), width=2 * a, height=2 * b, angle=0, edgecolor='k', fc='None', lw=2, ls='--')
+    ellipse = Ellipse(
+        xy=(0, 0),
+        width=2 * a,
+        height=2 * b,
+        angle=0,
+        edgecolor="k",
+        fc="None",
+        lw=2,
+        ls="--",
+    )
     plt.gca().add_patch(ellipse)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
 
-    plt.title('Gravitational potential on X-Y plane at Z={}'.format(0.0))
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    plt.title("Gravitational potential on X-Y plane at Z={}".format(0.0))
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.savefig(filename, dpi=300)
 
 
@@ -70,5 +79,5 @@ def run_example():
     pdlog.info("Finished tri-axial ellipsoid example, goodbye!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_example()

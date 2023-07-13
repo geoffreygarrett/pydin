@@ -50,30 +50,19 @@ config_setting(
 
 CORE_LINKOPTS = select({
     ":msvc_compiler": [
-        #        "/openmp",
     ],
     "@platforms//os:osx": [
-        # openmp
-        #        "-lomp",
-        #        "-fopenmp",
     ],
     "//conditions:default": [
-        #        "-fopenmp",
     ],
 })
 
 CORE_COPTS = select({
-    ":msvc_compiler": [
-        #        "/openmp",
-    ],
+    ":msvc_compiler": [],
     "@platforms//os:osx": [
-
-        # openmp
         "-Xpreprocessor",
-        #        "-fopenmp",
     ],
     "//conditions:default": [
-        #        "-fopenmp",
     ],
 })
 
@@ -91,7 +80,7 @@ pybind_library(
     hdrs = [":core_hdrs"],
     copts = CORE_COPTS,
     defines = [
-
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG",
         #        "PYBIND11_DETAILED_ERROR_MESSAGES",
         #        "ODIN_USE_GLOG",
         #        "GLOG_CUSTOM_PREFIX_SUPPORT",
@@ -112,14 +101,15 @@ pybind_library(
             #            "@org_gnu_gsl//:gsl",
         ],
         "//conditions:default": [
-            "@org_gnu_gsl//:gsl",
+
+            #            "@org_gnu_gsl//:gsl",
         ],
     }),
 )
 
 pybind_extension(
     name = "core",
-    srcs = ["src/core.cpp"],
+    srcs = ["pydin/core.cpp"],
     copts = CORE_COPTS,
     defines = select({
         "@platforms//os:osx": [
@@ -129,7 +119,8 @@ pybind_extension(
             #            "ODIN_USE_GSL",
         ],
         "//conditions:default": [
-            "ODIN_USE_GSL",
+            "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG",
+            #            "ODIN_USE_GSL",
         ],
     }),
     #    defines = [
@@ -287,10 +278,77 @@ py_library(
         ":core",
         ":core_stubs",
     ],
-    imports = ["."],
+    imports = ["pydin"],
     visibility = ["//visibility:public"],
     deps = [requirement("numpy")],
 )
+
+#genrule(
+#    name = "pydin_stubs2",
+#    srcs = [
+#        ":pydin_module",
+#        ":pydin-zip",
+#    ],
+#    outs = ["pydin-stubs"],
+#    cmd = """
+#    OUT_FILE=$$(mktemp)
+#    $(execpath @bazel_tools//tools/zip:zipper) $(location :pydin-zip)
+#    PYTHONPATH=$(@D) \
+#      $(execpath :stub_generator) \
+#        --ignore-invalid signature \
+#        --ignore-invalid defaultarg \
+#        --log-level DEBUG \
+#        pydin \
+#
+#     mv $${OUT_FILE} $(OUTS)
+#    """,
+#    tools = [
+#        ":black",
+#        ":stub_generator",
+#        "@bazel_tools//tools/zip:zipper",
+#    ],
+#)
+
+#Usage: zipper [vxc[fC]] x.zip [-d exdir] [[zip_path1=]file1 ... [zip_pathn=]filen]
+#  v verbose - list all file in x.zip
+#  x extract - extract files in x.zip to current directory, or
+#       an optional directory relative to the current directory
+#       specified through -d option
+#  c create  - add files to x.zip
+#  f flatten - flatten files to use with create or extract operation
+#  C compress - compress files when using the create operation
+#x and c cannot be used in the same command-line.
+#
+#For every file, a path in the zip can be specified. Examples:
+#  zipper c x.zip a/b/__init__.py= # Add an empty file at a/b/__init__.py
+#  zipper c x.zip a/b/main.py=foo/bar/bin.py # Add file foo/bar/bin.py at a/b/main.py
+#
+#If the zip path is not specified, it is assumed to be the file path.
+
+#pybind_stubgen(
+#    name = "pydin_stubs",
+#    src = ":core",
+#    code_formatter = ":black",
+#    ignore_invalid = [
+#        "signature",
+#        "defaultarg",
+#    ],
+#    log_level = "DEBUG",
+#    module_name = "core",
+#    no_setup_py = True,
+#    root_module_suffix = "-stubs",
+#    tool = ":stub_generator",
+#)
+
+#pkg_tar(
+#    name = "test_stubs",
+#    srcs = [
+#        ":pydin_module",
+#        ":pydin_stubs",
+#    ],
+#    #    prefix = "pydin",
+#    visibility = ["//visibility:private"],
+#)
 
 ## pybind11 pydin stubs #############################################################################
 py_binary(
