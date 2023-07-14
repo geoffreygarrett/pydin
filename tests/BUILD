@@ -32,6 +32,22 @@ py_test(
 )
 
 py_test(
+    name = "test_tree",
+    srcs = ["test_tree.py"],
+    args = [
+        "--junit-xml=test_tree.xml",
+        "-v",
+    ],
+    python_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:pydin",
+        requirement("pytest"),
+        requirement("numpy"),
+    ],
+)
+
+py_test(
     name = "test_gravitation",
     srcs = ["test_gravitation.py"],
     args = [

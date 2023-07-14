@@ -8,30 +8,7 @@ load(
     "requirement",
 )
 
-exports_files(["MODULE.bazel"])
-#string_flag(
-#    name = "gsl_library",
-#    default = "enabled",
-#    doc = "Configuration to use gsl library",
-#    values = [
-#        "enabled",
-#        "disabled",
-#    ],
-#)
-
-#config_setting(
-#    name = "without_gsl",
-#    flag_values = {gsl_library: "disabled"},
-#)
-
-# without gsl for windows and mac
-#config_setting(
-#    name = "without_gsl",
-#    flag_values = {
-#        "@platforms//os:windows": "disabled",
-#        "@platforms//os:osx": "disabled",
-#    },
-#)
+#exports_files(["MODULE.bazel"])
 
 platform(
     name = "x64_windows-clang-cl",
@@ -58,7 +35,8 @@ CORE_LINKOPTS = select({
 })
 
 CORE_COPTS = select({
-    ":msvc_compiler": [],
+    ":msvc_compiler": [
+    ],
     "@platforms//os:osx": [
         "-Xpreprocessor",
     ],
@@ -81,17 +59,15 @@ pybind_library(
     copts = CORE_COPTS,
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG",
-        #        "PYBIND11_DETAILED_ERROR_MESSAGES",
-        #        "ODIN_USE_GLOG",
-        #        "GLOG_CUSTOM_PREFIX_SUPPORT",
+        "PYBIND11_DETAILED_ERROR_MESSAGES",
     ],
     includes = ["include"],
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         #        "@com_github_google_glog//:glog",
-        "@com_github_oneapi_onetbb//:tbb",
-        "@com_github_uscilab_cereal//:cereal",
+        #        "@com_github_oneapi_onetbb//:tbb",
+        #        "@com_github_uscilab_cereal//:cereal",
         "@odin",
     ] + select({
         "@platforms//os:osx": [
@@ -123,10 +99,7 @@ pybind_extension(
             #            "ODIN_USE_GSL",
         ],
     }),
-    #    defines = [
-    #        "CORE_VERSION_INFO=\"0.1.0\"",
-    #    ],
-    includes = ["pydin/include"],
+    #    includes = ["pydin/include"],
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [

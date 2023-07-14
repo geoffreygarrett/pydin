@@ -6,6 +6,7 @@
 #include <pydin/bind_logging.hpp>
 #include <pydin/bind_mcts.hpp>
 #include <pydin/bind_tbb.hpp>
+#include <pydin/bind_tree.hpp>
 
 #ifdef ODIN_USE_GSL
 
@@ -47,7 +48,8 @@ PYBIND11_MODULE(core, m) {
     // auto m_mip = m.def_submodule("mip");
     // auto m_mcts = m.def_submodule("mcts");
 
-    using StateVariant = std::variant<state::mixed_integer_program<int, double>, Eigen::VectorX<int>>;
+    using StateVariant
+            = std::variant<state::mixed_integer_program<int, double>, Eigen::VectorX<int>>;
     py::class_<StateVariant>(m, "StateVariant", py::module_local())
             .def(py::init<>())
             .def(py::init<state::mixed_integer_program<int, double>>())
@@ -55,28 +57,31 @@ PYBIND11_MODULE(core, m) {
             .def(
                     "is_mip",
                     [](const StateVariant &s) {
-                        return std::holds_alternative<state::mixed_integer_program<int, double>>(s);
+                        return std::holds_alternative<state::mixed_integer_program<int, double>>(
+                                s);
                     },
                     "Returns true if the variant is a mixed integer program")
             .def(
                     "is_eigen",
-                    [](const StateVariant &s) { return std::holds_alternative<Eigen::VectorX<int>>(s); },
+                    [](const StateVariant &s) {
+                        return std::holds_alternative<Eigen::VectorX<int>>(s);
+                    },
                     "Returns true if the variant is an eigen vector")
             .def(
                     "get_mip",
                     [](const StateVariant &s) -> state::mixed_integer_program<int, double> {
-                        if (auto val = std::get_if<state::mixed_integer_program<int, double>>(&s)) {
+                        if (auto val
+                            = std::get_if<state::mixed_integer_program<int, double>>(&s)) {
                             return *val;
                         }
-                        throw std::runtime_error("StateVariant does not hold a mixed integer program");
+                        throw std::runtime_error(
+                                "StateVariant does not hold a mixed integer program");
                     },
                     "Returns the mixed integer program")
             .def(
                     "get_eigen",
                     [](const StateVariant &s) -> Eigen::VectorX<int> {
-                        if (auto val = std::get_if<Eigen::VectorX<int>>(&s)) {
-                            return *val;
-                        }
+                        if (auto val = std::get_if<Eigen::VectorX<int>>(&s)) { return *val; }
                         throw std::runtime_error("StateVariant does not hold an Eigen vector");
                     },
                     "Returns the Eigen vector")
@@ -90,14 +95,15 @@ PYBIND11_MODULE(core, m) {
                 }
             });
 
-    bind_mcts<StateVariant, action::single_integer<int>, reward::single_scalar<float>, double>(m, "");
+    bind_mcts<StateVariant, action::single_integer<int>, reward::single_scalar<float>, double>(m,
+                                                                                               "");
 
     // bind_mcts<Eigen::VectorX<int>, action::single_integer<int>, reward::single_scalar<float>,
     // double>(m, "");
 
     bind_astrodynamics<double>(m, "");
 
-    auto m_gravitation = m.def_submodule("gravitation");
+    auto m_gravitation  = m.def_submodule("gravitation");
     m_gravitation.doc() = R"pbdoc(
             Gravitation submodule
             ---------------------
@@ -106,6 +112,9 @@ PYBIND11_MODULE(core, m) {
                :toctree: _generate
                gravitation
         )pbdoc";
+
+    auto m_tree = m.def_submodule("tree");
+    bind_tree<>(m_tree, "");
 
 #ifdef ODIN_USE_GSL
     bind_gravitation<double>(m_gravitation, "");
