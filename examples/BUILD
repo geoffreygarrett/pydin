@@ -21,7 +21,7 @@ filegroup(
 #    deps = [
 #        requirement("numpy"),
 #        requirement("matplotlib"),
-#        "@//:pydin",
+#        "@//pydin",
 #    ],
 #)
 
@@ -32,7 +32,18 @@ py_binary(
     deps = [
         requirement("numpy"),
         requirement("matplotlib"),
-        "@//:pydin",
+        "@//pydin",
+    ],
+)
+
+py_binary(
+    name = "odinscript",
+    srcs = ["odinscript.py"],
+    python_version = "PY3",
+    deps = [
+        requirement("numpy"),
+        requirement("matplotlib"),
+        "@//pydin",
     ],
 )
 
@@ -43,7 +54,7 @@ py_binary(
     deps = [
         requirement("numpy"),
         requirement("matplotlib"),
-        "@//:pydin",
+        "@//pydin",
     ],
 )
 
@@ -54,7 +65,7 @@ py_binary(
     deps = [
         requirement("numpy"),
         requirement("matplotlib"),
-        "@//:pydin",
+        "@//pydin",
     ],
 )
 
@@ -66,7 +77,7 @@ py_binary(
 #        requirement("numpy"),
 #        requirement("matplotlib"),
 #        requirement("numba"),
-#        "@//:pydin",
+#        "@//pydin",
 #    ],
 #)
 
@@ -82,7 +93,7 @@ py_binary(
 #        requirement("numpy"),
 #        requirement("matplotlib"),
 #        requirement("scikit-learn"),
-#        "@//:pydin",
+#        "@//pydin",
 #    ],
 #)
 
@@ -106,7 +117,7 @@ py_binary(
     python_version = "PY3",
     deps = [
         requirement("numba"),
-        "@//:pydin",
+        "@//pydin",
     ],
 )
 #
@@ -122,6 +133,6 @@ py_binary(
 #        requirement("python-igraph"),
 #        requirement("plotly"),
 #        #        requirement("scikit-learn"),
-#        "@//:pydin",
+#        "@//pydin",
 #    ],
 #)

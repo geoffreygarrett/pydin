@@ -10,6 +10,7 @@ build --jobs=20
 
 # Building with optimization and verbose on failures.
 build -c opt
+build --incompatible_enable_cc_toolchain_resolution # https://github.com/grailbio/bazel-toolchain#quickstart
 
 #--verbose_failures
 
@@ -25,6 +26,9 @@ test --test_summary=detailed
 #build --action_env=PYTHON_BIN_PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/python3.10"
 #build --repo_env PYTHON_BIN_PATH="/home/geoffrey/mambaforge-pypy3/envs/gtoc12/bin/python"
 
+# Change thrust_device_system to CUDA
+build --@com_github_nvidia_thrust//:thrust_host_system=TBB
+build --@com_github_nvidia_thrust//:thrust_device_system=CUDA
 
 #common --experimental_enable_bzlmod
 

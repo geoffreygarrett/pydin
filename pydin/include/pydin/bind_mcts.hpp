@@ -147,22 +147,22 @@ void bind_mcts(py::module &m, const std::string &suffix = "") {
                 return ss.str();
             });
 
-    py::class_<SearchMetrics>(m, "SearchMetrics")
-            .def_readonly("search_seconds", &SearchMetrics::search_seconds)
-            .def_readonly("search_iterations", &SearchMetrics::search_iterations)
+    py::class_<MCTSSearchMetrics>(m, "MCTSSearchMetrics")
+            .def_readonly("search_seconds", &MCTSSearchMetrics::search_seconds)
+            .def_readonly("search_iterations", &MCTSSearchMetrics::search_iterations)
             .def_readonly("fevals_transitions_evaluated",
-                          &SearchMetrics::fevals_transitions_evaluated)
-            .def_readonly("fevals_rewards_evaluated", &SearchMetrics::fevals_rewards_evaluated)
-            .def_readonly("fevals_actions_generated", &SearchMetrics::fevals_actions_generated)
-            .def_readonly("fevals_terminal_checks", &SearchMetrics::fevals_terminal_checks)
-            .def_readonly("fevals_selection_policy", &SearchMetrics::fevals_selection_policy)
-            .DECLARE_REPR(SearchMetrics)
-            .DECLARE_BINARY_PICKLING(SearchMetrics)
-            .DECLARE_IO_FUNCTIONS(SearchMetrics);
+                          &MCTSSearchMetrics::fevals_transitions_evaluated)
+            .def_readonly("fevals_rewards_evaluated", &MCTSSearchMetrics::fevals_rewards_evaluated)
+            .def_readonly("fevals_actions_generated", &MCTSSearchMetrics::fevals_actions_generated)
+            .def_readonly("fevals_terminal_checks", &MCTSSearchMetrics::fevals_terminal_checks)
+            .def_readonly("fevals_selection_policy", &MCTSSearchMetrics::fevals_selection_policy)
+            .DECLARE_REPR(MCTSSearchMetrics)
+            .DECLARE_BINARY_PICKLING(MCTSSearchMetrics)
+            .DECLARE_IO_FUNCTIONS(MCTSSearchMetrics);
 
     using mcts_type = MCTS<State, Action, Reward, Float>;
     py::class_<mcts_type, std::shared_ptr<mcts_type>>(m, ("MCTS" + suffix).c_str())
-//            .def(py::init<std::shared_ptr<py_node_type>>(), "root"_a)
+            //            .def(py::init<std::shared_ptr<py_node_type>>(), "root"_a)
             .def(py::init<State,
                           action_generator,
                           state_transition,
@@ -189,28 +189,29 @@ void bind_mcts(py::module &m, const std::string &suffix = "") {
             .def("set_fn_is_terminal", &mcts_type::set_fn_is_terminal)
             .def("set_fn_reward", &mcts_type::set_fn_reward)
             .def("set_fn_selection_policy", &mcts_type::set_fn_selection_policy)
-            .def(
-                    "search",
-                    [&](mcts_type &self,
-                        size_t     iterations,
-                        double     seconds,
-                        bool       expand_all,
-                        bool       contraction,
-                        int        leaf_parallelism) {
-                        return execute_with_gil_release([&]() {
-                            return self.search(iterations,
-                                               seconds,
-                                               expand_all,
-                                               contraction,
-                                               leaf_parallelism);
-                        });
-                    },
-                    "iterations"_a       = 1000,
-                    "seconds"_a          = -1.0,
-                    "expand_all"_a       = false,
-                    "contraction"_a      = true,
-                    "leaf_parallelism"_a = 4,
-                    mcts_search_docstrings.c_str())
+            .def("search",
+                 &mcts_type::search,
+                 py::call_guard<py::gil_scoped_release>(),
+                 //                    [&](mcts_type &self,
+                 //                        size_t     iterations,
+                 //                        double     seconds,
+                 //                        bool       expand_all,
+                 //                        bool       contraction,
+                 //                        int        leaf_parallelism) {
+                 //                        return execute_with_gil_release([&]() {
+                 //                            return self.search(iterations,
+                 //                                               seconds,
+                 //                                               expand_all,
+                 //                                               contraction,
+                 //                                               leaf_parallelism);
+                 //                        });
+                 //                    },
+                 "iterations"_a       = 1000,
+                 "seconds"_a          = -1.0,
+                 "expand_all"_a       = false,
+                 "contraction"_a      = true,
+                 "leaf_parallelism"_a = 4,
+                 mcts_search_docstrings.c_str())
             .def(
                     "get_root",
                     [](mcts_type &self) {

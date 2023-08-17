@@ -1,4 +1,3 @@
-import pytest
 from pydin.core.tbb import TBBControl
 
 

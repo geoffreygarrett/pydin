@@ -1,5 +1,5 @@
 import numpy as np
-from pydin.core.tree import Node
+from pydin.core.tree import Node, Tree
 
 
 def test_basic_test():
@@ -130,6 +130,26 @@ def test_exotic_types():
     # why is this being prioritised as a py::object? we have eigen.h?
     # TODO: figure this out
     # assert node.holds_python_object() is False
+
+
+def test_basic_tree():
+    node = Node(10)
+    child1 = Node(5)
+    child2 = Node(15)
+    child3 = Node(20)
+    grandchild1 = Node(25)
+    grandchild2 = Node(30)
+
+    child1.add_child(grandchild1)
+    child2.add_child(grandchild2)
+    node.add_child(child1)
+    node.add_child(child2)
+    node.add_child(child3)
+
+    tree = Tree(node)
+
+    assert tree.get_root().get_data() == node.get_data()
+    assert tree.get_root() != node  # to demonstrate that it's a copy, because TREE takes ownership
 
 
 if __name__ == "__main__":

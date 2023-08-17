@@ -59,3 +59,10 @@
                 std::string binary_str = state.cast<std::string>();                               \
                 return from_binary<std::shared_ptr<cls>>(binary_str, true);                       \
             }))
+
+#define DEF_REPR(cls)                                                                             \
+    def("__repr__", [](const cls &obj) {                                                          \
+        std::ostringstream os;                                                                    \
+        os << obj;                                                                                \
+        return os.str();                                                                          \
+    })

@@ -3,24 +3,31 @@
 #include <iostream>
 
 #include <pydin/bind_astro.hpp>
+//#include <pydin/bind_autodiff.hpp>
+#include <pydin/bind_gravitation.hpp>
+//#include <pydin/bind_jit.hpp>
+#include <pydin/bind_linalg.hpp>
 #include <pydin/bind_logging.hpp>
 #include <pydin/bind_mcts.hpp>
+#include <pydin/bind_omp.hpp>
+#include <pydin/bind_shape.h>
 #include <pydin/bind_tbb.hpp>
 #include <pydin/bind_tree.hpp>
 
 #ifdef ODIN_USE_GSL
 
-#    include <pydin/bind_gravitation.hpp>
 
 #endif
 
 namespace py = pybind11;
 using namespace pybind11::literals;
+using namespace pydin;
 
 PYBIND11_MODULE(core, m) {
 
-    // auto m_omp = m.def_submodule("omp");
-    // bind_omp(m_omp, "");
+
+    auto m_omp = m.def_submodule("omp");
+    bind_omp(m_omp, "");
     // https://stackoverflow.com/questions/69745880/how-can-i-multithread-this-code-snippet-in-c-with-eigen
 
 #ifdef PYDIN_VERSION
@@ -41,12 +48,11 @@ PYBIND11_MODULE(core, m) {
     // with pydin.tbb.TBBControl(4) as tbb:
     // print(tbb.get_max_threads())  # Should print '4'
     // print(tbb.get_stack_size())  # Should print the default value
+//    bind_odinscript(m);
 
     auto m_logging = m.def_submodule("logging");
     bind_logging(m_logging, "");
 
-    // auto m_mip = m.def_submodule("mip");
-    // auto m_mcts = m.def_submodule("mcts");
 
     using StateVariant
             = std::variant<state::mixed_integer_program<int, double>, Eigen::VectorX<int>>;
@@ -115,6 +121,15 @@ PYBIND11_MODULE(core, m) {
 
     auto m_tree = m.def_submodule("tree");
     bind_tree<>(m_tree, "");
+
+    auto m_shape = m.def_submodule("shape");
+    bind_shape<double, Eigen::Vector3d>(m_shape);
+
+    auto m_linalg = m.def_submodule("linalg");
+    bind_linalg<>(m_linalg, "");
+
+    //    auto m_autodiff = m.def_submodule("autodiff");
+    //    bind_autodiff<>(m_autodiff, "");
 
 #ifdef ODIN_USE_GSL
     bind_gravitation<double>(m_gravitation, "");
