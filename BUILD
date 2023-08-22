@@ -15,7 +15,7 @@ compile_pip_requirements(
         "--allow-unsafe",
         "-v",
     ],
-    requirements_in = "@pydin//:requirements.in",
+    requirements_in = "//pydin:requirements.in",
     requirements_txt = "requirements_lock.txt",
     requirements_windows = "requirements_windows.txt",
 )
@@ -95,7 +95,7 @@ pkg_files(
         "//pydin:py.typed",
     ],
     prefix = "pydin",
-    visibility = ["//visibility:private"],
+    visibility = ["//visibility:public"],
 )
 
 pkg_files(

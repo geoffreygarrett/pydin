@@ -14,6 +14,19 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(
+    name = "requirements",
+    extra_args = [
+        "--allow-unsafe",
+        "-v",
+    ],
+    requirements_in = "//pydin:requirements.in",
+    requirements_txt = "requirements_lock.txt",
+    requirements_windows = "requirements_windows.txt",
+)
+
 #py_binary(
 #    name = "orbit_plot",
 #    srcs = ["orbit_plot.py"],

@@ -84,47 +84,27 @@ filegroup(
     ]),
 )
 
-#ifdef USE_ESA_POLYHEDRAL_GRAVITY
-
-#cc_import(
-#    name = "llvm",
-#    hdrs = "@llvm_toolchain//:include",
-#    shared_library = "@llvm_toolchain//:lib",
-#    strip_include_prefix = "include",
-#    visibility = ["//visibility:public"],
-#)
-
-#cc_library(
-#    name = "llvm_headers",
-#    srcs = glob([
-#        "@llvm//:include/**/*.h",
-#        "@llvm//:include/**/*.hpp",
-#        "@llvm//:include/**/*.inc",
-#    ]),
-#    includes = ["@llvm//:include"],
-#)
-
-LLVM_DEPS = [
-    "@llvm//:llvm_headers",
-    "@llvm//:lib_libLLVMSupport_a",
-    "@llvm//:lib_libLLVMDemangle_a",
-    "@llvm//:lib_libLLVMBinaryFormat_a",
-    "@llvm//:lib_libLLVMCore_a",
-    "@llvm//:lib_libLLVMMC_a",
-    "@llvm//:lib_libLLVMMCDisassembler_a",
-    "@llvm//:lib_libLLVMBitReader_a",
-    "@llvm//:lib_libLLVMMCParser_a",
-    "@llvm//:lib_libLLVMAnalysis_a",
-    "@llvm//:lib_libLLVMObject_a",
-    "@llvm//:lib_libLLVMTransformUtils_a",
-    "@llvm//:lib_libLLVMInstCombine_a",
-    "@llvm//:lib_libLLVMScalarOpts_a",
-    "@llvm//:lib_libLLVMTarget_a",
-    "@llvm//:lib_libLLVMX86CodeGen_a",
-    "@llvm//:lib_libLLVMAsmPrinter_a",
-    "@llvm//:lib_libLLVMCodeGen_a",
-    "@llvm//:lib_libLLVMExecutionEngine_a",
-]
+#LLVM_DEPS = [
+#    "@llvm//:llvm_headers",
+#    "@llvm//:lib_libLLVMSupport_a",
+#    "@llvm//:lib_libLLVMDemangle_a",
+#    "@llvm//:lib_libLLVMBinaryFormat_a",
+#    "@llvm//:lib_libLLVMCore_a",
+#    "@llvm//:lib_libLLVMMC_a",
+#    "@llvm//:lib_libLLVMMCDisassembler_a",
+#    "@llvm//:lib_libLLVMBitReader_a",
+#    "@llvm//:lib_libLLVMMCParser_a",
+#    "@llvm//:lib_libLLVMAnalysis_a",
+#    "@llvm//:lib_libLLVMObject_a",
+#    "@llvm//:lib_libLLVMTransformUtils_a",
+#    "@llvm//:lib_libLLVMInstCombine_a",
+#    "@llvm//:lib_libLLVMScalarOpts_a",
+#    "@llvm//:lib_libLLVMTarget_a",
+#    "@llvm//:lib_libLLVMX86CodeGen_a",
+#    "@llvm//:lib_libLLVMAsmPrinter_a",
+#    "@llvm//:lib_libLLVMCodeGen_a",
+#    "@llvm//:lib_libLLVMExecutionEngine_a",
+#]
 
 pybind_library(
     name = "core_libs",
@@ -147,7 +127,7 @@ pybind_library(
         #        "@com_github_google_glog//:glog",
         #        "@com_github_oneapi_onetbb//:tbb",
         #        "@com_github_uscilab_cereal//:cereal",
-        "@odin",
+        "//odin",
 
         #        "@github_llvm_llvm_project//:llvm",
         #        "@llvm",
@@ -218,7 +198,7 @@ genrule(
 
 py_binary(
     name = "stub_generator",
-    srcs = ["//:tools/stub_generator.py"],
+    srcs = ["//pydin:tools/stub_generator.py"],
     deps = [
         requirement("pybind11-stubgen"),
         requirement("black"),
@@ -247,6 +227,8 @@ filegroup(
         "__init__.py",
     ]),
 )
+
+exports_files(["py.typed"])
 
 py_library(
     name = "pydin",
@@ -282,6 +264,7 @@ py_binary(
         "pydin",
     ],
     legacy_create_init = False,
+    visibility = ["//visibility:public"],
     deps = [
         "//pydin",
         requirement("numpy"),
@@ -310,8 +293,8 @@ py_binary(
     name = "dev",
     srcs = ["dev.py"],
     data = [
-        "//tests:data/Eros.face",
-        "//tests:data/Eros.node",
+        "//pydin/tests:data/Eros.face",
+        "//pydin/tests:data/Eros.node",
         "@eros_50k_ply//file",
     ],
     imports = [
@@ -319,8 +302,9 @@ py_binary(
         "pydin",
     ],
     legacy_create_init = False,
+    visibility = ["//visibility:public"],
     deps = [
-        "//pydin",
+        ":pydin",
         requirement("numpy"),
         requirement("pandas"),
         requirement("numba"),

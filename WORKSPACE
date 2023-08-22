@@ -26,42 +26,12 @@ load("@pydin//:repositories.bzl", "pydin_dependencies")
 
 pydin_dependencies()
 
-# --------------------------------------------------------- LLVM
-#load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
-
-#bazel_toolchain_dependencies()
-
-#load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm", "llvm_toolchain")
-
-#llvm_toolchain(
-#    name = "llvm_toolchain",
-#    llvm_version = "16.0.0",
-#)
-
-#llvm(
-#    name = "llvm",
-#    llvm_version = "16.0.0",
-#)
-
-#load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
-
-#llvm_register_toolchains()
-# --------------------------------------------------------- LLVM
-
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 load("@rules_pkg//pkg:deps.bzl", "rules_pkg_dependencies")
 
 rules_foreign_cc_dependencies()
 
 rules_pkg_dependencies()
-
-#register_execution_platforms(
-#    ":x64_windows-clang-cl",
-#)
-#
-#register_toolchains(
-#    "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
-#)
 
 load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
