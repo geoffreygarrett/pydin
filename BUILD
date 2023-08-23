@@ -18,6 +18,8 @@ compile_pip_requirements(
     requirements_in = "//pydin:requirements.in",
     requirements_txt = "requirements_lock.txt",
     requirements_windows = "requirements_windows.txt",
+    requirements_darwin = "requirements_darwin.txt",
+    requirements_linux = "requirements_linux.txt",
 )
 
 #exports_files(["MODULE.bazel"])
