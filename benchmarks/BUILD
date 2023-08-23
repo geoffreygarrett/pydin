@@ -1,6 +1,6 @@
 # Load the necessary rules from the pip repository
 load(
-    "@pip//:requirements.bzl",
+    "@pip_benchmark//:requirements.bzl",
     "data_requirement",
     "dist_info_requirement",
     "entry_point",

@@ -1,5 +1,5 @@
 load(
-    "@pip//:requirements.bzl",
+    "@pip_example//:requirements.bzl",
     "data_requirement",
     "dist_info_requirement",
     "entry_point",
@@ -12,19 +12,6 @@ filegroup(
         "model_gravitation_ellipsoidal.py",
     ],
     visibility = ["//visibility:public"],
-)
-
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-
-compile_pip_requirements(
-    name = "requirements",
-    extra_args = [
-        "--allow-unsafe",
-        "-v",
-    ],
-    requirements_in = "//pydin:requirements.in",
-    requirements_txt = "requirements_lock.txt",
-    requirements_windows = "requirements_windows.txt",
 )
 
 #py_binary(
@@ -149,3 +136,80 @@ py_binary(
 #        "@//pydin",
 #    ],
 #)
+
+## pybind11 pydin stubs #############################################################################
+py_binary(
+    name = "foo_test",
+    srcs = ["foo_test.py"],
+    data = [
+        "//pydin/tests:data/Eros.face",
+        "//pydin/tests:data/Eros.node",
+        "@eros_50k_ply//file",
+    ],
+    imports = [
+        ".",
+        "pydin",
+    ],
+    legacy_create_init = False,
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pydin/pydin",
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("numba"),
+        requirement("pillow"),
+        requirement("sympy"),
+        #requirement("pyvista"),
+
+        # mayavi
+        requirement("mayavi"),
+        requirement("trimesh"),
+        requirement("pyqt6"),
+        requirement("pyside6"),
+        #        entry_point("traitsui", "qt4"),
+        #        requirement("wxPython"),
+        #        requirement("pyside2"),
+        #        requirement("pyside2"),
+        requirement("matplotlib"),
+        #        entry_point("setuptools", "easy_install"),
+        # @pip_setuptools
+    ],
+)
+
+py_binary(
+    name = "dev",
+    srcs = ["dev.py"],
+    data = [
+        "//pydin/tests:data/Eros.face",
+        "//pydin/tests:data/Eros.node",
+        "@eros_50k_ply//file",
+    ],
+    imports = [
+        ".",
+        "pydin",
+    ],
+    legacy_create_init = False,
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pydin/pydin",
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("numba"),
+        requirement("pillow"),
+        requirement("sympy"),
+        #requirement("pyvista"),
+
+        # mayavi
+        requirement("mayavi"),
+        requirement("trimesh"),
+        requirement("pyqt6"),
+        requirement("pyside6"),
+        #        entry_point("traitsui", "qt4"),
+        #        requirement("wxPython"),
+        #        requirement("pyside2"),
+        #        requirement("pyside2"),
+        requirement("matplotlib"),
+        #        entry_point("setuptools", "easy_install"),
+        # @pip_setuptools
+    ],
+)

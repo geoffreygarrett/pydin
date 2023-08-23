@@ -1,0 +1,40 @@
+# run requirements
+numpy
+
+# optional visualisation requirements
+matplotlib
+seaborn
+sympy
+pandas
+
+## mayavi
+setuptools
+#PyQt5
+#PyQt5==5.15.9
+#PyQt5-Qt5==5.15.2
+#PyQt5-sip==12.12.1
+#pyside2
+#pyside2>=5.15.2.1
+PyQt6
+pyside6
+
+#pyvista#
+#pyqt5
+mayavi
+#traitsui
+
+#buildtools
+#wxPython
+
+# optional requirements
+h5py
+scikit-learn
+numba
+trimesh
+
+# build requirements
+black
+pybind11-stubgen
+
+# test requirements
+pytest

@@ -1,0 +1,6 @@
+# run requirements
+numpy
+
+# build requirements
+black
+pybind11-stubgen

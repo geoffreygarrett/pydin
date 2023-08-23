@@ -2,7 +2,7 @@ load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library", "
 load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
 load("@rules_pkg//pkg:mappings.bzl", "filter_directory", "pkg_files", "pkg_mklink", "strip_prefix")
 load(
-    "@pip//:requirements.bzl",
+    "@pip_build//:requirements.bzl",
     "data_requirement",
     "entry_point",
     "requirement",
@@ -247,82 +247,5 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         requirement("numpy"),
-    ],
-)
-
-## pybind11 pydin stubs #############################################################################
-py_binary(
-    name = "foo_test",
-    srcs = ["foo_test.py"],
-    data = [
-        "//tests:data/Eros.face",
-        "//tests:data/Eros.node",
-        "@eros_50k_ply//file",
-    ],
-    imports = [
-        ".",
-        "pydin",
-    ],
-    legacy_create_init = False,
-    visibility = ["//visibility:public"],
-    deps = [
-        "//pydin",
-        requirement("numpy"),
-        requirement("pandas"),
-        requirement("numba"),
-        requirement("pillow"),
-        requirement("sympy"),
-        #requirement("pyvista"),
-
-        # mayavi
-        requirement("mayavi"),
-        requirement("trimesh"),
-        requirement("pyqt6"),
-        requirement("pyside6"),
-        #        entry_point("traitsui", "qt4"),
-        #        requirement("wxPython"),
-        #        requirement("pyside2"),
-        #        requirement("pyside2"),
-        requirement("matplotlib"),
-        #        entry_point("setuptools", "easy_install"),
-        # @pip_setuptools
-    ],
-)
-
-py_binary(
-    name = "dev",
-    srcs = ["dev.py"],
-    data = [
-        "//pydin/tests:data/Eros.face",
-        "//pydin/tests:data/Eros.node",
-        "@eros_50k_ply//file",
-    ],
-    imports = [
-        ".",
-        "pydin",
-    ],
-    legacy_create_init = False,
-    visibility = ["//visibility:public"],
-    deps = [
-        ":pydin",
-        requirement("numpy"),
-        requirement("pandas"),
-        requirement("numba"),
-        requirement("pillow"),
-        requirement("sympy"),
-        #requirement("pyvista"),
-
-        # mayavi
-        requirement("mayavi"),
-        requirement("trimesh"),
-        requirement("pyqt6"),
-        requirement("pyside6"),
-        #        entry_point("traitsui", "qt4"),
-        #        requirement("wxPython"),
-        #        requirement("pyside2"),
-        #        requirement("pyside2"),
-        requirement("matplotlib"),
-        #        entry_point("setuptools", "easy_install"),
-        # @pip_setuptools
     ],
 )

@@ -2,27 +2,12 @@ load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library", "
 load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
 load("@rules_pkg//pkg:mappings.bzl", "filter_directory", "pkg_files", "pkg_mklink", "strip_prefix")
 load(
-    "@pip//:requirements.bzl",
+    "@pip_build//:requirements.bzl",
     "data_requirement",
     "entry_point",
     "requirement",
 )
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-
-compile_pip_requirements(
-    name = "requirements",
-    extra_args = [
-        "--allow-unsafe",
-        "-v",
-    ],
-    requirements_in = "//pydin:requirements.in",
-    requirements_txt = "requirements_lock.txt",
-    requirements_windows = "requirements_windows.txt",
-    requirements_darwin = "requirements_darwin.txt",
-    requirements_linux = "requirements_linux.txt",
-)
-
-#exports_files(["MODULE.bazel"])
 
 platform(
     name = "x64_windows-clang-cl",

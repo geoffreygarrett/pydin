@@ -1,5 +1,5 @@
 load(
-    "@pip//:requirements.bzl",
+    "@pip_test//:requirements.bzl",
     "data_requirement",
     "dist_info_requirement",
     "entry_point",
