@@ -1,3 +1,8 @@
+import sys
+import pydin
+
+print(pydin.__dict__)
+
 def normalize_vector(v):
     norm = np.linalg.norm(v)
     return v / norm if norm != 0 else v
@@ -415,6 +420,8 @@ def polar_plane_from_point(p, a, b, c):
 if __name__ == '__main__':
     import numpy as np
     from mayavi import mlab
+    import pydin
+    print(dir(pydin))
     from pydin import plotting
     from pydin.core import rot2, rot3
     from pydin.core.shape import calculate_polar_plane_pole, ellipse_of_intersection, marching_cubes

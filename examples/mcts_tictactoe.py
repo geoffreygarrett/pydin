@@ -76,7 +76,7 @@ def reward_fn(state: np.ndarray[np.int32]) -> float:
     return 0.0  # the game is not finished yet
 
 
-import pydin.core.logging as pdlog
+import core.logging as pdlog
 import concurrent.futures
 
 
@@ -87,7 +87,7 @@ def run_mcts(i: int):
     iterations = 1000
     try:
         pdlog.debug("Starting MCTS 2222")
-        mcts = pydin.MCTS(
+        mcts = pydin.core.MCTS(
             initial_state=initial_state,
             action_generator=get_actions_fn,
             transition=transition_fn,
@@ -123,7 +123,7 @@ def main2():
 
     return results
 
-
+import core
 def main1():
     # // change log pattern
     # pdlog.set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v")
@@ -139,13 +139,13 @@ def main1():
     # mcts.set_fn_transition(transition_fn)
     # mcts.set_fn_selection_policy(pydin.EpsilonGreedy(epsilon=0.01))
 
-    mcts = pydin.MCTS(
+    mcts = core.MCTS(
         initial_state=initial_state,
         action_generator=get_actions_fn,
         transition=transition_fn,
         is_terminal=is_terminal_fn,
         reward=reward_fn,
-        selection_policy=pydin.EpsilonGreedy(epsilon=0.01),
+        selection_policy=core.EpsilonGreedy(epsilon=0.01),
         # selection_policy=pydin.UCB1(0.01),
     )
 

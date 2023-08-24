@@ -7,6 +7,10 @@ load(
     "entry_point",
     "requirement",
 )
+load(
+    "@pip_example//:requirements.bzl",
+    example_requirement = "requirement",
+)
 
 #exports_files(["MODULE.bazel"])
 
@@ -42,7 +46,9 @@ bool_flag(
 
 config_setting(
     name = "gsl_ellipsoidal_gravity",
-    flag_values = {"use_gsl_ellipsoidal_gravity": "True"},
+    flag_values = {
+        "use_gsl_ellipsoidal_gravity": "False",
+    },
     #    values = {"define": "USE_GSL_ELLIPSOIDAL_GRAVITY"},
 )
 
@@ -55,6 +61,7 @@ CORE_LINKOPTS = select({
     ":msvc_compiler": [
     ],
     "@platforms//os:osx": [
+        #        "-lomp",
     ],
     "//conditions:default": [
         "-fopenmp",  # Add the -fopenmp flag
@@ -120,7 +127,9 @@ pybind_library(
         ":gsl_ellipsoidal_gravity": ["USE_GSL_ELLIPSOIDAL_GRAVITY"],
         "//conditions:default": [],
     }),
-    includes = ["include"],
+    includes = select({
+        "//conditions:default": ["include"],
+    }),
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
@@ -128,7 +137,8 @@ pybind_library(
         #        "@com_github_oneapi_onetbb//:tbb",
         #        "@com_github_uscilab_cereal//:cereal",
         "//odin",
-
+        "@libomp//:omp",
+        "@brew_gsl//:gsl",
         #        "@github_llvm_llvm_project//:llvm",
         #        "@llvm",
         #        "@llvm_toolchain//:all-components-x86_64-linux",
@@ -136,7 +146,7 @@ pybind_library(
         #        "@com_github_autodiff_autodiff//:autodiff",
     ] + select({
         ":gsl_ellipsoidal_gravity": [
-            "@org_gnu_gsl//:gsl",
+            #            "@org_gnu_gsl//:gsl",
         ],
         "//conditions:default": [],
     }) + select({
@@ -168,6 +178,7 @@ pybind_extension(
     visibility = ["//visibility:public"],
     deps = [
         ":core_libs",
+
         #        "@llvm",
         #        "@llvm//:lib_libLLVMCore_a",
         #        "@llvm//:lib_libLLVMIRReader_a",
@@ -242,10 +253,49 @@ py_library(
         #        "@github_bodgergely_spdlog_python//:spdlog",
     ],
     imports = [
-        ".",
+        "..",
+        #        "bor/pydin",
     ],
     visibility = ["//visibility:public"],
     deps = [
         requirement("numpy"),
+    ],
+)
+
+py_binary(
+    name = "dev",
+    srcs = ["dev.py"],
+    data = [
+        "//pydin/tests:data/Eros.face",
+        "//pydin/tests:data/Eros.node",
+        "@eros_50k_ply//file",
+    ],
+    imports = [
+        #        ".",
+        "bor/pydin",
+    ],
+    legacy_create_init = False,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@@bor//pydin/pydin",
+        example_requirement("numpy"),
+        example_requirement("pandas"),
+        example_requirement("numba"),
+        example_requirement("pillow"),
+        example_requirement("sympy"),
+        #requirement("pyvista"),
+
+        # mayavi
+        example_requirement("mayavi"),
+        example_requirement("trimesh"),
+        example_requirement("pyqt6"),
+        example_requirement("pyside6"),
+        #        entry_point("traitsui", "qt4"),
+        #        requirement("wxPython"),
+        #        requirement("pyside2"),
+        #        requirement("pyside2"),
+        example_requirement("matplotlib"),
+        #        entry_point("setuptools", "easy_install"),
+        # @pip_setuptools
     ],
 )

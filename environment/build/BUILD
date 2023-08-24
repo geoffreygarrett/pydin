@@ -6,10 +6,10 @@ compile_pip_requirements(
         "--allow-unsafe",
         "-v",
     ],
+    requirements_darwin = "requirements_darwin.txt",
     requirements_in = "requirements.in",
+    requirements_linux = "requirements_linux.txt",
     requirements_txt = "requirements_lock.txt",
     requirements_windows = "requirements_windows.txt",
-    requirements_darwin = "requirements_darwin.txt",
-    requirements_linux = "requirements_linux.txt",
     visibility = ["//visibility:public"],
 )

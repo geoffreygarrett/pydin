@@ -272,7 +272,7 @@ namespace pydin {
     template<typename T>
     py::class_<T> bind_derived_shape(pybind11::module_ &m, const std::string &shape_name) {
         using point_type        = typename T::point_type;
-        using point_series_type = point_series_type_trait<T>::type;
+        using point_series_type = typename point_series_type_trait<T>::type;
         return py::class_<T>(m, shape_name.c_str())
                 .def("volume", &T::volume)
                 .def("surface_area", &T::surface_area)

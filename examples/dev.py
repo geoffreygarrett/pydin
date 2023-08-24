@@ -2,6 +2,13 @@ def normalize_vector(v):
     norm = np.linalg.norm(v)
     return v / norm if norm != 0 else v
 
+import pkgutil
+
+available_modules = [name for _, name, _ in pkgutil.iter_modules()]
+
+for module_name in available_modules:
+    print(module_name)
+
 
 def ellipse_of_intersection(l, m, n, f, a, b, c):
     # Establish normal vector
@@ -413,9 +420,22 @@ def polar_plane_from_point(p, a, b, c):
 
 
 if __name__ == '__main__':
+    # iterature through all paths on the python path and print this format
+    # PATH_DIR: <path>
+    # INSIDE_DIR: <content>
+    # ----------
+    #
+    # import sys
+    # import os
+    # for path in sys.paPATH_DIR: {path}")
+    # for content in os.listdir(path):
+    #     print(f"INSIDE_DIR: th:
+    #     print(f"{content}")
+    #     print("----------")
     import numpy as np
     from mayavi import mlab
     from pydin import plotting
+    # import plotting
     from pydin.core import rot2, rot3
     from pydin.core.shape import calculate_polar_plane_pole, ellipse_of_intersection, marching_cubes
     from pydin import logging
@@ -429,7 +449,7 @@ if __name__ == '__main__':
     b = 2.
     c = 1.
 
-
+    logging.info(f"a = {a}")
     def voxel_carving(p_list):
         n_grid = 120j
         lim_factor = 1.5
@@ -477,14 +497,18 @@ if __name__ == '__main__':
 
     grid, grid_inside_mask = voxel_carving([
         # np.array([0, 7, 7]),
-        np.array([0, -7, 7]),
-        np.array([0, 7, -7]),
-        np.array([7, 0, 0]),
-        np.array([0, -7, -7]),
-        np.array([0, 7, 0]),
         np.array([0, -7, 0]),
+        np.array([0, 7, 0]),
+        np.array([0, 0, 7]),
+        # np.array([0, 7, -7]),
+        # np.array([7, 0, 0]),
+        # np.array([0, -7, -7]),
+        # np.array([0, 7, 0]),
+        # np.array([0, -7, 0]),
 
     ])
+
+    print(grid.shape)
     # grid, grid_inside_mask = voxel_carving([np.array([0, -2, 2]), np.array([0, 2, -2])])
 
     # grid_inside_mask = np.where(grid[0] ** 2 / a ** 2 + grid[1] ** 2 / b ** 2 + grid[2] ** 2 / c ** 2 <= 1, 1, 0)

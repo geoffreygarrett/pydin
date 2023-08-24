@@ -117,7 +117,7 @@ py_binary(
     python_version = "PY3",
     deps = [
         requirement("numba"),
-        "@//pydin",
+        "//pydin/pydin",
     ],
 )
 #
@@ -185,13 +185,12 @@ py_binary(
         "@eros_50k_ply//file",
     ],
     imports = [
-        ".",
-        "pydin",
+        #        ".",
     ],
     legacy_create_init = False,
     visibility = ["//visibility:public"],
     deps = [
-        "//pydin/pydin",
+        "@@bor//pydin/pydin",
         requirement("numpy"),
         requirement("pandas"),
         requirement("numba"),

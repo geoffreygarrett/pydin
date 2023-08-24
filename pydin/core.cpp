@@ -107,7 +107,7 @@ PYBIND11_MODULE(core, m) {
     // bind_mcts<Eigen::VectorX<int>, action::single_integer<int>, reward::single_scalar<float>,
     // double>(m, "");
 
-    bind_astrodynamics<double>(m, "");
+    pydin::domain::bind_astrodynamics<double>(m, "");
 
     auto m_gravitation  = m.def_submodule("gravitation");
     m_gravitation.doc() = R"pbdoc(

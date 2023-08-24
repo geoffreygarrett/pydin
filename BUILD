@@ -29,6 +29,12 @@ alias(
 
 exports_files(["tools/stub_generator.py"])
 
+py_binary(
+    name = "stub_generator",
+    srcs = ["tools/stub_generator.py"],
+    deps = [],
+)
+
 genrule(
     name = "__init__",
     outs = ["__dummy__.py"],
@@ -76,10 +82,10 @@ pkg_files(
     name = "pydin_module",
     srcs = [
         ":__init__",
-        "//pydin:core",
         "//pydin:core_stubs",
         "//pydin:py.files",
         "//pydin:py.typed",
+        "//pydin/pydin:core",
     ],
     prefix = "pydin",
     visibility = ["//visibility:public"],
@@ -87,14 +93,14 @@ pkg_files(
 
 pkg_files(
     name = "pydin_tests",
-    srcs = ["//tests:test_files"],
+    srcs = ["//pydin/tests:test_files"],
     prefix = "tests",
     visibility = ["//visibility:private"],
 )
 
 pkg_files(
     name = "pydin_examples",
-    srcs = ["//examples:example_files"],
+    srcs = ["//pydin/examples:example_files"],
     prefix = "examples",
     visibility = ["//visibility:private"],
 )
@@ -102,8 +108,8 @@ pkg_files(
 pkg_files(
     name = "environment_files",
     srcs = [
-        "//:environment.yml",
-        "//:requirements.txt",
+        "//pydin:environment.yml",
+        "//pydin:requirements.txt",
     ],
     visibility = ["//visibility:private"],
 )

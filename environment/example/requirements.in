@@ -1,5 +1,7 @@
 # run requirements
-numpy
+numpy @ https://mirrors.aliyun.com/pypi/packages/64/5f/3f01d753e2175cfade1013eea08db99ba1ee4bdb147ebcf3623b75d12aa7/numpy-1.24.4-cp310-cp310-macosx_11_0_arm64.whl#sha256=ed094d4f0c177b1b8e7aa9cba7d6ceed51c0e569a5318ac0ca9a090680a6a1b1 ; platform_machine == "x86_64" and sys_platform == "darwin"
+numpy ; platform_machine != "arm64"
+cython #mac
 
 # optional visualisation requirements
 matplotlib
@@ -9,32 +11,12 @@ pandas
 
 ## mayavi
 setuptools
-#PyQt5
-#PyQt5==5.15.9
-#PyQt5-Qt5==5.15.2
-#PyQt5-sip==12.12.1
-#pyside2
-#pyside2>=5.15.2.1
 PyQt6
 pyside6
-
-#pyvista#
-#pyqt5
 mayavi
-#traitsui
-
-#buildtools
-#wxPython
 
 # optional requirements
 h5py
 scikit-learn
 numba
 trimesh
-
-# build requirements
-black
-pybind11-stubgen
-
-# test requirements
-pytest

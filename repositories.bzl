@@ -5,11 +5,20 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 DEPS = [
+    #    {
+    #        "function": git_repository,
+    #        "name": "rules_python",
+    #        "remote": "https://github.com/bazelbuild/rules_python.git",
+    #        "commit": "49d2b7aadb084ac7cae48583c38af6da2ce41a02",
+    #    },
     {
-        "function": git_repository,
-        "name": "rules_python",
-        "remote": "https://github.com/bazelbuild/rules_python.git",
-        "commit": "49d2b7aadb084ac7cae48583c38af6da2ce41a02",
+        "function": http_archive,
+        "name": "rules_pythn",
+        #    "urls": ["https://github.com/bazelbuild/rules_python/releases/tag/0.25.0"],
+        "urls": ["https://github.com/bazelbuild/rules_python/archive/refs/tags/0.25.0.zip"],
+        "build_file": "//pydin:external/rules_python.BUILD",
+        #    "sha256":
+        "strip_prefix": "rules_python-0.25.0",
     },
     {
         "function": git_repository,
