@@ -2,6 +2,7 @@ def normalize_vector(v):
     norm = np.linalg.norm(v)
     return v / norm if norm != 0 else v
 
+
 import pkgutil
 
 available_modules = [name for _, name, _ in pkgutil.iter_modules()]
@@ -450,8 +451,10 @@ if __name__ == '__main__':
     c = 1.
 
     logging.info(f"a = {a}")
+
+
     def voxel_carving(p_list):
-        n_grid = 120j
+        n_grid = 90j
         lim_factor = 1.5
         a_lim = lim_factor * a
         b_lim = lim_factor * b
@@ -498,8 +501,8 @@ if __name__ == '__main__':
     grid, grid_inside_mask = voxel_carving([
         # np.array([0, 7, 7]),
         np.array([0, -7, 0]),
-        np.array([0, 7, 0]),
-        np.array([0, 0, 7]),
+        # np.array([0, 7, 0]),
+        # np.array([0, 0, 7]),
         # np.array([0, 7, -7]),
         # np.array([7, 0, 0]),
         # np.array([0, -7, -7]),

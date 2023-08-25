@@ -47,7 +47,7 @@ bool_flag(
 config_setting(
     name = "gsl_ellipsoidal_gravity",
     flag_values = {
-        "use_gsl_ellipsoidal_gravity": "False",
+        "use_gsl_ellipsoidal_gravity": "True",
     },
     #    values = {"define": "USE_GSL_ELLIPSOIDAL_GRAVITY"},
 )
@@ -133,12 +133,9 @@ pybind_library(
     linkopts = CORE_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
-        #        "@com_github_google_glog//:glog",
-        #        "@com_github_oneapi_onetbb//:tbb",
-        #        "@com_github_uscilab_cereal//:cereal",
         "//odin",
         "@libomp//:omp",
-        "@brew_gsl//:gsl",
+        #        "@brew_gsl//:gsl",
         #        "@github_llvm_llvm_project//:llvm",
         #        "@llvm",
         #        "@llvm_toolchain//:all-components-x86_64-linux",
