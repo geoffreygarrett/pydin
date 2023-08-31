@@ -140,15 +140,11 @@ py_binary(
 ## pybind11 pydin stubs #############################################################################
 py_binary(
     name = "foo_test",
-    srcs = ["foo_test.py"],
+    srcs = ["examples_develop/foo_test.py"],
     data = [
         "//pydin/tests:data/Eros.face",
         "//pydin/tests:data/Eros.node",
         "@eros_50k_ply//file",
-    ],
-    imports = [
-        ".",
-        "pydin",
     ],
     legacy_create_init = False,
     visibility = ["//visibility:public"],
@@ -178,14 +174,11 @@ py_binary(
 
 py_binary(
     name = "dev",
-    srcs = ["dev.py"],
+    srcs = ["examples_develop/dev.py"],
     data = [
         "//pydin/tests:data/Eros.face",
         "//pydin/tests:data/Eros.node",
         "@eros_50k_ply//file",
-    ],
-    imports = [
-        #        ".",
     ],
     legacy_create_init = False,
     visibility = ["//visibility:public"],

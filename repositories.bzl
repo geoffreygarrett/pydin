@@ -47,6 +47,7 @@ DEPS = [
         "name": "eros_50k_ply",
         "urls": ["https://3d-asteroids.space/data/asteroids/models/e/433_Eros_50k.ply"],
         "downloaded_file_path": "eros_50k.ply",
+        "sha256": "7685d247f0b4a689dcad0016cdd66830474a3e1487a3f36e4568a98e91c4dd75",
     },
     {
         "function": http_archive,

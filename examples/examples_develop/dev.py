@@ -5,10 +5,11 @@ def normalize_vector(v):
 
 import pkgutil
 
-available_modules = [name for _, name, _ in pkgutil.iter_modules()]
 
-for module_name in available_modules:
-    print(module_name)
+# available_modules = [name for _, name, _ in pkgutil.iter_modules()]
+#
+# for module_name in available_modules:
+#     print(module_name)
 
 
 def ellipse_of_intersection(l, m, n, f, a, b, c):
@@ -420,6 +421,132 @@ def polar_plane_from_point(p, a, b, c):
     return l, m, n, f
 
 
+# Helper function to populate vertex neighbors
+def _populate_vertex_neighbors(faces, vertex_count):
+    vertex_neighbors = {i: set() for i in range(vertex_count)}
+    for face in faces:
+        for i, j in zip(face, np.roll(face, -1)):
+            vertex_neighbors[i].add(j)
+            vertex_neighbors[j].add(i)
+    return vertex_neighbors
+
+
+# Deduplication function
+def deduplicate_vertices(vertices, faces, tolerance=1e-7):
+    unique_vertices, unique_indices = np.unique(vertices.round(decimals=int(-np.log10(tolerance))), axis=0,
+                                                return_inverse=True)
+    unique_faces = unique_indices[faces]
+    return unique_vertices, unique_faces
+
+
+# Laplacian smoothing function
+def laplacian_smoothing(vertices, faces, iterations=10, alpha=0.1):
+    new_vertices = np.copy(vertices)
+    vertex_neighbors = _populate_vertex_neighbors(faces, len(vertices))
+
+    for _ in range(iterations):
+        delta_vertices = np.zeros_like(new_vertices)
+        for i, neighbors in vertex_neighbors.items():
+            if neighbors:
+                avg_neighbor = np.mean(new_vertices[list(neighbors)], axis=0)
+                delta_vertices[i] = avg_neighbor - new_vertices[i]
+
+        new_vertices += alpha * delta_vertices
+
+    return new_vertices
+
+
+# Vertex normal calculation
+def calculate_vertex_normals(vertices, faces):
+    vertex_normals = np.zeros(vertices.shape, dtype=np.float64)
+    for face in faces:
+        normal = np.cross(vertices[face[1]] - vertices[face[0]], vertices[face[2]] - vertices[face[0]])
+        vertex_normals[face] += normal
+
+    vertex_normals /= np.linalg.norm(vertex_normals, axis=1)[:, np.newaxis]
+    return vertex_normals
+
+
+# Find nearest voxel given a vertex
+def find_nearest_voxel(vertex, grid_coords):
+    distances = np.sum((grid_coords - vertex) ** 2, axis=1)
+    return grid_coords[np.argmin(distances)]
+
+
+# Constrained Laplacian smoothing
+# def constrained_laplacian_smoothing(vertices, faces, grid, grid_inside_mask, iterations=10, alpha=0.1):
+#     new_vertices = np.copy(vertices)
+#     vertex_neighbors = _populate_vertex_neighbors(faces, len(vertices))
+#     grid_coords = np.column_stack(np.where(grid_inside_mask))
+#
+#     for _ in range(iterations):
+#         delta_vertices = np.zeros_like(new_vertices)
+#         for i, neighbors in vertex_neighbors.items():
+#             if neighbors:
+#                 avg_neighbor = np.mean(new_vertices[list(neighbors)], axis=0)
+#                 delta_vertices[i] = avg_neighbor - new_vertices[i]
+#
+#                 nearest_voxel = find_nearest_voxel(new_vertices[i], grid_coords)
+#                 # Apply constraints based on nearest voxel here, if needed
+#             #..
+#
+#
+#         new_vertices += alpha * delta_vertices
+#
+#     return new_vertices
+
+def constrained_laplacian_smoothing(vertices, faces, grid, grid_inside_mask, iterations=10, alpha=0.1):
+    new_vertices = np.copy(vertices)
+    vertex_neighbors = _populate_vertex_neighbors(faces, len(vertices))
+    grid_coords = np.column_stack(np.where(grid_inside_mask))
+
+    for _ in range(iterations):
+        delta_vertices = np.zeros_like(new_vertices)
+        for i, neighbors in vertex_neighbors.items():
+            if neighbors:
+                avg_neighbor = np.mean(new_vertices[list(neighbors)], axis=0)
+                delta_vertices[i] = avg_neighbor - new_vertices[i]
+
+                # nearest_voxel = find_nearest_voxel(new_vertices[i], grid_coords)
+
+
+        # temp_vertices = new_vertices + alpha * delta_vertices
+
+        new_vertices += alpha * delta_vertices
+
+    return new_vertices
+
+
+def generate_points_on_ellipsoid(a, b, c, n_points):
+    """
+    Generate points distributed on the surface of an ellipsoid.
+
+    Parameters:
+    - a, b, c: semi-diameters of the ellipsoid along x, y, and z axes
+    - n_points: number of points to generate on the ellipsoid
+
+    Returns:
+    - points: array of shape (n_points, 3) containing the x, y, z coordinates of the points
+    """
+
+    # Generate points on a unit sphere using the Golden Spiral method
+    indices = np.arange(0, n_points, dtype=float) + 0.5
+    phi = np.arccos(1 - indices / n_points * 2)  # arccos(1 - 2*(i+0.5)/N)
+    theta = np.pi * (1 + 5 ** 0.5) * indices  # Golden angle
+
+    # Convert spherical coordinates to Cartesian coordinates
+    x_unit, y_unit, z_unit = np.cos(theta) * np.sin(phi), np.sin(theta) * np.sin(phi), np.cos(phi)
+
+    # Scale the unit sphere to the ellipsoid using the semi-diameters a, b, c
+    x = a * x_unit
+    y = b * y_unit
+    z = c * z_unit
+
+    points = np.column_stack((x, y, z))
+
+    return points
+
+
 if __name__ == '__main__':
     # iterature through all paths on the python path and print this format
     # PATH_DIR: <path>
@@ -454,7 +581,7 @@ if __name__ == '__main__':
 
 
     def voxel_carving(p_list):
-        n_grid = 90j
+        n_grid = 32j
         lim_factor = 1.5
         a_lim = lim_factor * a
         b_lim = lim_factor * b
@@ -469,9 +596,9 @@ if __name__ == '__main__':
 
             # Expand dimensions of theta_cos and theta_sin to make them (100, 1)
             xyz = m_ellipse + np.outer(A * np.cos(theta_sample), r_ellipse) + np.outer(B * np.sin(theta_sample), s)
-            mlab.plot3d(xyz[:, 0], xyz[:, 1], xyz[:, 2], color=(1, 1, 1), tube_radius=0.04)
+            # mlab.plot3d(xyz[:, 0], xyz[:, 1], xyz[:, 2], color=(1, 1, 1), tube_radius=0.02)
             pole = calculate_polar_plane_pole(l, m, n, f, a, b, c)
-            mlab.points3d(*pole, color=(1, 1, 1), scale_factor=0.4)
+            # mlab.points3d(*pole, color=(1, 1, 1), scale_factor=0.4)
 
             ######
 
@@ -485,29 +612,34 @@ if __name__ == '__main__':
 
             # plot cone from polar point to the x1,xy,xz
             X = np.array([pole, m_ellipse])
-            mlab.plot3d(X[:, 0], X[:, 1], X[:, 2], color=(1, 1, 1), tube_radius=0.04)
+            # mlab.plot3d(X[:, 0], X[:, 1], X[:, 2], color=(1, 1, 1), tube_radius=0.04)
 
             Xdif = xyz[:, 0] - pole[0]
             Ydif = xyz[:, 1] - pole[1]
             Zdif = xyz[:, 2] - pole[2]
 
-            mlab.quiver3d(pole[0] * np.ones_like(Xdif), pole[1] * np.ones_like(Ydif), pole[2] * np.ones_like(Zdif),
-                          Xdif, Ydif,
-                          Zdif, color=(0.7, 0.7, 1), scale_factor=1, mode='2ddash', opacity=0.1)
+            # mlab.quiver3d(pole[0] * np.ones_like(Xdif), pole[1] * np.ones_like(Ydif), pole[2] * np.ones_like(Zdif),
+            #               Xdif, Ydif,
+            #               Zdif, color=(0.7, 0.7, 1), scale_factor=1, mode='2ddash', opacity=0.1)
 
         return grid, active_grid
 
 
+    n_points = 100  # Number of points to generate
+
+    points_on_ellipsoid = generate_points_on_ellipsoid(a * 10, b * 10, c * 10, n_points)
+
     grid, grid_inside_mask = voxel_carving([
-        # np.array([0, 7, 7]),
-        np.array([0, -7, 0]),
-        # np.array([0, 7, 0]),
+        # # np.array([0, 7, 7]),
+        # np.array([0, -7, 0]),
+        # # np.array([0, 7, 0]),
         # np.array([0, 0, 7]),
         # np.array([0, 7, -7]),
-        # np.array([7, 0, 0]),
+        # # np.array([7, 0, 0]),
         # np.array([0, -7, -7]),
-        # np.array([0, 7, 0]),
-        # np.array([0, -7, 0]),
+        # # np.array([0, 7, 0]),
+        # # np.array([0, -7, 0]),
+        *points_on_ellipsoid
 
     ])
 
@@ -516,10 +648,14 @@ if __name__ == '__main__':
 
     # grid_inside_mask = np.where(grid[0] ** 2 / a ** 2 + grid[1] ** 2 / b ** 2 + grid[2] ** 2 / c ** 2 <= 1, 1, 0)
     grid_inside_mask = np.where(grid_inside_mask, 1, 0)
-    mesh = marching_cubes(grid, grid_inside_mask, 0.1)
+    mesh = marching_cubes(grid, grid_inside_mask, 1e-6)
 
     faces = np.array(mesh.get_facets())
     vertices = np.array(mesh.get_vertices())
+    vertices, faces = deduplicate_vertices(vertices, faces)
+    # vertices = laplacian_smoothing(vertices, faces, iterations=20, alpha=0.9)
+
+    vertices = constrained_laplacian_smoothing(vertices, faces, grid, grid_inside_mask, iterations=60, alpha=0.1)
     # print(faces)
     # print(vertices)
 
@@ -543,7 +679,7 @@ if __name__ == '__main__':
                          # wireframe setting:
                          representation='surface',
                          color=(0.2, 0.2, 1),
-                         opacity=0.1,
+                         opacity=0.8,
                          line_width=0.1,
                          figure=figure)
 
@@ -591,7 +727,7 @@ if __name__ == '__main__':
         mlab.quiver3d(x2, y2, z2, x1 - x2, y1 - y2, z1 - z2, color=(1, 1, 1), scale_factor=1)
 
 
-    # plot_ellipsoid_mayavi(a, b, c, figure=figure, color=(1, 0, 0), opacity=0.2)
+    plot_ellipsoid_mayavi(a, b, c, figure=figure, color=(1, 0, 0), opacity=0.2)
 
     mlab.show()
     raise SystemExit

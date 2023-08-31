@@ -20,6 +20,3 @@ h5py
 scikit-learn
 numba
 trimesh
-
-# other useful
-screeninfo

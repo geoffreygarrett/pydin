@@ -118,7 +118,9 @@ cython==3.0.0 \
     --hash=sha256:edae615cb4af51d5173e76ba9aea212424d025c57012e9cdf2f131f774c5ba71 \
     --hash=sha256:f42f304c097cc53e9eb5f1a1d150380353d5018a3191f1b77f0de353c762181e \
     --hash=sha256:ff1aef1a03cfe293237c7a86ae9625b0411b2df30c53d1a7f29a8d381f38a1df
-    # via -r pydin/environment/example/requirements.in
+    # via
+    #   -r pydin/environment/example/requirements.in
+    #   screeninfo
 envisage==7.0.3 \
     --hash=sha256:b931db6cca3132f02e46eb4dc0994a98ea2786d0250e7b8ad946d7b2f9813a7c \
     --hash=sha256:f7b1af88bf3a8fff2a9ac6e36bb48dea9929e3f612204cfe94aed62b0316c9e3
@@ -505,6 +507,26 @@ pygments==2.15.1 \
     --hash=sha256:8ace4d3c1dd481894b2005f560ead0f9f19ee64fe983366be1a21e171d12775c \
     --hash=sha256:db2db3deb4b4179f399a09054b023b6a586b76499d36965813c71aa8ed7b5fd1
     # via mayavi
+pyobjc-core==9.2 \
+    --hash=sha256:0fa950f092673883b8bd28bc18397415cabb457bf410920762109b411789ade9 \
+    --hash=sha256:2d23ee539f2ba5e9f5653d75a13f575c7e36586fc0086792739e69e4c2617eda \
+    --hash=sha256:41189c2c680931c0395a55691763c481fc681f454f21bb4f1644f98c24a45954 \
+    --hash=sha256:586e4cae966282eaa61b21cae66ccdcee9d69c036979def26eebdc08ddebe20f \
+    --hash=sha256:b9809cf96678797acb72a758f34932fe8e2602d5ab7abec15c5ac68ddb481720 \
+    --hash=sha256:bbc8de304ee322a1ee530b4d2daca135a49b4a49aa3cedc6b2c26c43885f4842 \
+    --hash=sha256:d734b9291fec91ff4e3ae38b9c6839debf02b79c07314476e87da8e90b2c68c3 \
+    --hash=sha256:fa674a39949f5cde8e5c7bbcd24496446bfc67592b028aedbec7f81dc5fc4daa
+    # via pyobjc-framework-cocoa
+pyobjc-framework-cocoa==9.2 \
+    --hash=sha256:312977ce2e3989073c6b324c69ba24283de206fe7acd6dbbbaf3e29238a22537 \
+    --hash=sha256:32d9ac1033fac1b821ddee8c68f972a7074ad8c50bec0bea9a719034c1c2fb94 \
+    --hash=sha256:3b1e6287b3149e4c6679cdbccd8e9ef6557a4e492a892e80a77df143f40026d2 \
+    --hash=sha256:739a421e14382a46cbeb9a883f192dceff368ad28ec34d895c48c0ad34cf2c1d \
+    --hash=sha256:9e02d8a7cc4eb7685377c50ba4f17345701acf4c05b1e7480d421bff9e2f62a4 \
+    --hash=sha256:aae7841cf40c26dd915f4dd828f91c6616e6b7998630b72e704750c09e00f334 \
+    --hash=sha256:b236bb965e41aeb2e215d4e98a5a230d4b63252c6d26e00924ea2e69540a59d6 \
+    --hash=sha256:efd78080872d8c8de6c2b97e0e4eac99d6203a5d1637aa135d071d464eb2db53
+    # via screeninfo
 pyparsing==3.0.9 \
     --hash=sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb \
     --hash=sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc
@@ -619,6 +641,10 @@ scipy==1.11.1 \
     --hash=sha256:fb5b492fa035334fd249f0973cc79ecad8b09c604b42a127a677b45a9a3d4289 \
     --hash=sha256:ffb28e3fa31b9c376d0fb1f74c1f13911c8c154a760312fbee87a21eb21efe31
     # via scikit-learn
+screeninfo==0.8.1 \
+    --hash=sha256:9983076bcc7e34402a1a9e4d7dabf3729411fd2abb3f3b4be7eba73519cd2ed1 \
+    --hash=sha256:e97d6b173856edcfa3bd282f81deb528188aff14b11ec3e195584e7641be733c
+    # via -r pydin/environment/example/requirements.in
 seaborn==0.12.2 \
     --hash=sha256:374645f36509d0dcab895cba5b47daf0586f77bfe3b36c97c607db7da5be0139 \
     --hash=sha256:ebf15355a4dba46037dfd65b7350f014ceb1f13c05e814eda2c9f5fd731afc08
