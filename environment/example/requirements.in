@@ -8,6 +8,7 @@ matplotlib
 seaborn
 sympy
 pandas
+tk
 
 ## mayavi
 setuptools

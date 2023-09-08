@@ -224,5 +224,9 @@ py_binary(
         requirement("sympy"),
         requirement("numpy"),
         requirement("matplotlib"),
+        requirement("PyQt6"),
+        requirement("pyside6"),
+        requirement("scipy"),
+        requirement("mayavi"),
     ],
 )
