@@ -18,6 +18,11 @@ platform(
     ],
 )
 
+alias(
+    name = "pydin",
+    actual = "@pydin//:pydin",
+)
+
 ## PYBIND EXTENSION: CORE ###############################################
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 

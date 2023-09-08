@@ -26,13 +26,14 @@ filegroup(
 #)
 
 py_binary(
-    name = "model_gravitation_ellipsoidal",
-    srcs = ["model_gravitation_ellipsoidal.py"],
+    name = "example_ellipsoidal_gravity_models",
+    srcs = ["examples_gravity_models/ellipsoidal_gravity_models.py"],
+    main = "examples_gravity_models/ellipsoidal_gravity_models.py",
     python_version = "PY3",
     deps = [
         requirement("numpy"),
         requirement("matplotlib"),
-        "@//pydin",
+        "@//pydin/pydin",
     ],
 )
 
@@ -203,5 +204,25 @@ py_binary(
         requirement("matplotlib"),
         #        entry_point("setuptools", "easy_install"),
         # @pip_setuptools
+    ],
+)
+
+py_binary(
+    name = "example_autodiff_stts",
+    srcs = ["example_autodiff_stts.py"],
+    deps = [
+        requirement("sympy"),
+        requirement("numpy"),
+        requirement("matplotlib"),
+    ],
+)
+
+py_binary(
+    name = "example_autodiff_stts2",
+    srcs = ["example_autodiff_stts2.py"],
+    deps = [
+        requirement("sympy"),
+        requirement("numpy"),
+        requirement("matplotlib"),
     ],
 )
