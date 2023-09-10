@@ -70,7 +70,7 @@ def compute_tensors(eom, wrt, at, order):
                         base_value = f_lambda(**at_str).flatten()
                         for perm in itertools.permutations([j, k, l, m]):
                             fourth_order[
-                                :, perm[0], perm[1], perm[2], perm[3]
+                            :, perm[0], perm[1], perm[2], perm[3]
                             ] = base_value
 
     return first_order, second_order, third_order, fourth_order
@@ -114,15 +114,15 @@ def unique_combinations(elements, repeat):
 GM_Earth = 3.986004418e14
 GM_Moon = 4.9048695e12
 CD = 2.0
-S = 200.0
+S = 2000.0
 m = 5000.0
 r_moon = np.array([384400e3, 0, 0])
 r_earth = np.array([0, 0, 0])
 J2 = 1.08263e-3  # Earth's second zonal harmonic
 R_Earth = 6378.137e3  # Earth's radius in meters
-den = 1000000
+den = 100000
 r0 = 6771e3
-rho0 = 3.8 * 10**-12
+rho0 = 3.8 * 10 ** -12
 
 
 def rho_func(r):
@@ -137,7 +137,7 @@ def eom(state: np.ndarray, dt: float):
     accel_moon = -GM_Moon * rel_moon / (np.linalg.norm(rel_moon) ** 3)
     accel_earth = -GM_Earth * rel_earth / (np.linalg.norm(rel_earth) ** 3)
     accel_drag = (
-        -0.5 * rho_func(state[:3]) * np.linalg.norm(state[3:]) * CD * S / m * state[3:]
+            -0.5 * rho_func(state[:3]) * np.linalg.norm(state[3:]) * CD * S / m * state[3:]
     )
 
     # J2 Perturbation for Earth
@@ -147,7 +147,7 @@ def eom(state: np.ndarray, dt: float):
     j2_term_x = factor * (5 * (z / r_norm) ** 2 - 1) * x
     j2_term_y = factor * (5 * (z / r_norm) ** 2 - 1) * y
     j2_term_z = factor * (5 * (z / r_norm) ** 2 - 3) * z
-    j2_accel = np.array([j2_term_x, j2_term_y, j2_term_z]) * GM_Earth / (r_norm**3)
+    j2_accel = np.array([j2_term_x, j2_term_y, j2_term_z]) * GM_Earth / (r_norm ** 3)
 
     accel_total = accel_moon + accel_earth + j2_accel + accel_drag
     return np.concatenate((state[3:], accel_total))
@@ -173,14 +173,13 @@ sym_j2_term_x = factor * (5 * (z / r_norm) ** 2 - 1) * x
 sym_j2_term_y = factor * (5 * (z / r_norm) ** 2 - 1) * y
 sym_j2_term_z = factor * (5 * (z / r_norm) ** 2 - 3) * z
 sym_j2_accel = (
-    Matrix([sym_j2_term_x, sym_j2_term_y, sym_j2_term_z]) * GM_Earth / (r_norm**3)
+        Matrix([sym_j2_term_x, sym_j2_term_y, sym_j2_term_z]) * GM_Earth / (r_norm ** 3)
 )
 
 # Previous accelerations
 sym_accel = sym_accel_earth + sym_accel_moon + sym_j2_accel + sym_drag
 sym_eom = Matrix([vx, vy, vz, sym_accel[0], sym_accel[1], sym_accel[2]])
 wrt = [x, y, z, vx, vy, vz]
-
 
 
 def compute_third_order_terms(f_i_j, f_i_jk, f_i_jkl, x_i_j, x_i_jk, x_i_jkl):
@@ -193,8 +192,9 @@ def compute_third_order_terms(f_i_j, f_i_jk, f_i_jkl, x_i_j, x_i_jk, x_i_jkl):
     xdot_i_jkl = first_term + second_term + third_term
     return xdot_i_jkl
 
+
 def rk4_step(
-    func, sym_func, state, x_i_j, x_i_jk, x_i_jkl, x_i_jklm, dt, at, wrt, order=3
+        func, sym_func, state, x_i_j, x_i_jk, x_i_jkl, x_i_jklm, dt, at, wrt, order=3
 ):
     """Runge-Kutta 4th order method with tensor propagation."""
     next_x_i_j = None
@@ -257,11 +257,15 @@ def rk4_step(
     if order >= 2:
         # RK4 for 2nd-order tensor
         xdot_i_jk_1 = np.einsum("irs,rj,sk->ijk", f_i_jk_1, x_i_j, x_i_j) + np.einsum("ir,rjk->ijk", f_i_j_1, x_i_jk)
-        xdot_i_jk_2 = np.einsum("irs,rj,sk->ijk", f_i_jk_2, x_i_j + xdot_i_j_1 * dt / 2, x_i_j + xdot_i_j_1 * dt / 2) + np.einsum("ir,rjk->ijk", f_i_j_2, x_i_jk + xdot_i_jk_1 * dt / 2)
-        xdot_i_jk_3 = np.einsum("irs,rj,sk->ijk", f_i_jk_3, x_i_j + xdot_i_j_2 * dt / 2, x_i_j + xdot_i_j_2 * dt / 2) + np.einsum("ir,rjk->ijk", f_i_j_3, x_i_jk + xdot_i_jk_2 * dt / 2)
-        xdot_i_jk_4 = np.einsum("irs,rj,sk->ijk", f_i_jk_4, x_i_j + xdot_i_j_3 * dt, x_i_j + xdot_i_j_3 * dt) + np.einsum("ir,rjk->ijk", f_i_j_4, x_i_jk + xdot_i_jk_3 * dt)
+        xdot_i_jk_2 = np.einsum("irs,rj,sk->ijk", f_i_jk_2, x_i_j + xdot_i_j_1 * dt / 2,
+                                x_i_j + xdot_i_j_1 * dt / 2) + np.einsum("ir,rjk->ijk", f_i_j_2,
+                                                                         x_i_jk + xdot_i_jk_1 * dt / 2)
+        xdot_i_jk_3 = np.einsum("irs,rj,sk->ijk", f_i_jk_3, x_i_j + xdot_i_j_2 * dt / 2,
+                                x_i_j + xdot_i_j_2 * dt / 2) + np.einsum("ir,rjk->ijk", f_i_j_3,
+                                                                         x_i_jk + xdot_i_jk_2 * dt / 2)
+        xdot_i_jk_4 = np.einsum("irs,rj,sk->ijk", f_i_jk_4, x_i_j + xdot_i_j_3 * dt,
+                                x_i_j + xdot_i_j_3 * dt) + np.einsum("ir,rjk->ijk", f_i_j_4, x_i_jk + xdot_i_jk_3 * dt)
         next_x_i_jk = x_i_jk + ((xdot_i_jk_1 + 2 * xdot_i_jk_2 + 2 * xdot_i_jk_3 + xdot_i_jk_4) / 6) * dt
-
 
     if order >= 3:
         # RK4 for 3rd-order tensor
@@ -269,17 +273,19 @@ def rk4_step(
         xdot_i_jkl_1 = compute_third_order_terms(f_i_j_1, f_i_jk_1, f_i_jkl_1, x_i_j, x_i_jk, x_i_jkl)
 
         # Second stage
-        xdot_i_jkl_2 = compute_third_order_terms(f_i_j_2, f_i_jk_2, f_i_jkl_2, x_i_j + xdot_i_j_1 * dt / 2, x_i_jk + xdot_i_jk_1 * dt / 2, x_i_jkl + xdot_i_jkl_1 * dt / 2)
+        xdot_i_jkl_2 = compute_third_order_terms(f_i_j_2, f_i_jk_2, f_i_jkl_2, x_i_j + xdot_i_j_1 * dt / 2,
+                                                 x_i_jk + xdot_i_jk_1 * dt / 2, x_i_jkl + xdot_i_jkl_1 * dt / 2)
 
         # Third stage
-        xdot_i_jkl_3 = compute_third_order_terms(f_i_j_3, f_i_jk_3, f_i_jkl_3, x_i_j + xdot_i_j_2 * dt / 2, x_i_jk + xdot_i_jk_2 * dt / 2, x_i_jkl + xdot_i_jkl_2 * dt / 2)
+        xdot_i_jkl_3 = compute_third_order_terms(f_i_j_3, f_i_jk_3, f_i_jkl_3, x_i_j + xdot_i_j_2 * dt / 2,
+                                                 x_i_jk + xdot_i_jk_2 * dt / 2, x_i_jkl + xdot_i_jkl_2 * dt / 2)
 
         # Fourth stage
-        xdot_i_jkl_4 = compute_third_order_terms(f_i_j_4, f_i_jk_4, f_i_jkl_4, x_i_j + xdot_i_j_3 * dt, x_i_jk + xdot_i_jk_3 * dt, x_i_jkl + xdot_i_jkl_3 * dt)
+        xdot_i_jkl_4 = compute_third_order_terms(f_i_j_4, f_i_jk_4, f_i_jkl_4, x_i_j + xdot_i_j_3 * dt,
+                                                 x_i_jk + xdot_i_jk_3 * dt, x_i_jkl + xdot_i_jkl_3 * dt)
 
         # Combine all stages
         next_x_i_jkl = x_i_jkl + ((xdot_i_jkl_1 + 2 * xdot_i_jkl_2 + 2 * xdot_i_jkl_3 + xdot_i_jkl_4) / 6) * dt
-
 
     if order >= 4:
         # Rk4 for 4th-order tensor
@@ -309,22 +315,22 @@ def rk4_step(
         fifth_term_4th = np.einsum("ir,rjklm->ijklm", f_i_j, x_i_jklm)
 
         next_x_i_jklm = (
-            first_term_4th
-            + second_term_part1_4th
-            + second_term_part2_4th
-            + second_term_part3_4th
-            + third_term_part1_4th
-            + third_term_part2_4th
-            + third_term_part3_4th
-            + fourth_term_part1_4th
-            + fourth_term_part2_4th
-            + fourth_term_part3_4th
-            + fourth_term_part4_4th
-            + fourth_term_part5_4th
-            + fourth_term_part6_4th
-            + fourth_term_part7_4th
-            + fifth_term_4th
-        ) * dt + x_i_jklm
+                                first_term_4th
+                                + second_term_part1_4th
+                                + second_term_part2_4th
+                                + second_term_part3_4th
+                                + third_term_part1_4th
+                                + third_term_part2_4th
+                                + third_term_part3_4th
+                                + fourth_term_part1_4th
+                                + fourth_term_part2_4th
+                                + fourth_term_part3_4th
+                                + fourth_term_part4_4th
+                                + fourth_term_part5_4th
+                                + fourth_term_part6_4th
+                                + fourth_term_part7_4th
+                                + fifth_term_4th
+                        ) * dt + x_i_jklm
 
     else:
         next_x_i_jklm = x_i_jklm
@@ -332,14 +338,17 @@ def rk4_step(
     return next_x, next_x_i_j, next_x_i_jk, next_x_i_jkl, next_x_i_jklm
 
 
-H = 100e3
-r0 = np.array([6371e3 + H, 0, 0])
-v_circle = np.sqrt(GM_Earth / np.linalg.norm(r0))
-ecc = 0.0
-sma = np.linalg.norm(r0) / (1 - ecc)
-v_p = np.sqrt(GM_Earth * (2 / np.linalg.norm(r0) - 1 / sma))
+H = 300e3
+r_p = 6371e3 + H
+r0 = np.array([r_p, 0, 0])
+# v_circle = np.sqrt(GM_Earth / np.linalg.norm(r0))
+ecc = 0.02
+sma = np.linalg.norm(r_p) / (1 - ecc)
+# r_p = sma * (1 - ecc)
+# print(r_p)
+# v_a = np.sqrt(GM_Earth * (2 / np.linalg.norm(r_a) - 1 / sma))
+v_p = np.sqrt(GM_Earth * (2 / np.linalg.norm(r_p) - 1 / sma))
 v0 = np.array([0, 0, 1]) * v_p
-
 
 state0 = np.concatenate((r0, v0))
 
@@ -356,13 +365,15 @@ sst2_jk = sst2_jk0
 sst3_jkl = sst3_jkl0
 sst4_jklm = None
 
-
 t_orbit = 2 * np.pi * np.sqrt(sma ** 3 / GM_Earth)
 t = 0
 dt = 100
 trajectory = []
 relevant_keys = ["x", "y", "z", "vx", "vy", "vz"]
-t_end = t_orbit * 1.5
+t_end = t_orbit * 2.5
+
+jd = 86400
+t_end = jd * 10
 
 import time
 
@@ -402,8 +413,8 @@ print(f"Time elapsed: {end - start} seconds")
 # Initialize perturbations
 # n_perturbations = 500
 n_s = 2j
-v_lim = 100
-r_lim = 1000
+v_lim = 0.1
+r_lim = 1
 # n_perturbations = int(n_s.imag ** 6)
 n_perturbations = 200
 
@@ -427,7 +438,7 @@ sigma_vel = v_lim
 
 dx0 = np.random.multivariate_normal(
     np.zeros(6),
-    np.diag([sigma_pos, sigma_pos, sigma_pos, sigma_vel, sigma_vel, sigma_vel]),
+    np.diag([sigma_pos, sigma_pos, sigma_pos, sigma_vel, sigma_vel, sigma_vel]) ** 2,
     n_perturbations,
 ).T
 
@@ -497,7 +508,6 @@ for pert_idx in range(n_perturbations):
         t_pert += dt
 
     perturbed_trajectories.append(perturbed_trajectory)
-
 
 final_perturbed_states = np.array(
     [trajectory[-1] for trajectory in perturbed_trajectories]
@@ -697,9 +707,10 @@ if plot_with == 'matplotlib':
     plt.tight_layout()
     plt.show()
 
-elif plot_with=="mayavi":
+elif plot_with == "mayavi":
 
     from mayavi import mlab
+
     mlab.figure(size=(400, 300))
     # Clear the current Mayavi scene
     # mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
@@ -757,7 +768,7 @@ elif plot_with=="mayavi":
     dx_3 += trajectory[-1, :][..., None]
     numerical_dx /= data_norm
     numerical_dx += trajectory[-1, :][None, ...]
-    
+
     # mlab.points3d(*dx0[:3,:], color=(0, 0, 0), scale_factor=0.001, opacity=0.5)
     mlab.points3d(*dx_1[:3, :], color=(1, 0, 0), scale_factor=0.001, opacity=0.1)
     mlab.points3d(*dx_2[:3, :], color=(0, 0, 1), scale_factor=0.001, opacity=0.1)

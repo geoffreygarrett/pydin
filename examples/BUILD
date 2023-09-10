@@ -230,3 +230,17 @@ py_binary(
         requirement("mayavi"),
     ],
 )
+
+py_binary(
+    name = "example_autodiff_stts3",
+    srcs = ["example_autodiff_stts3.py"],
+    deps = [
+        requirement("sympy"),
+        requirement("numpy"),
+        requirement("matplotlib"),
+        requirement("PyQt6"),
+        requirement("pyside6"),
+        requirement("scipy"),
+        requirement("mayavi"),
+    ],
+)
