@@ -20,7 +20,8 @@ platform(
 
 alias(
     name = "pydin",
-    actual = "@pydin//:pydin",
+    actual = "//pydin/pydin",
+    visibility = ["//visibility:public"],
 )
 
 ## PYBIND EXTENSION: CORE ###############################################

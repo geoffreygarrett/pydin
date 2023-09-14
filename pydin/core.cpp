@@ -131,7 +131,7 @@ PYBIND11_MODULE(core, m) {
     //    auto m_autodiff = m.def_submodule("autodiff");
     //    bind_autodiff<>(m_autodiff, "");
 
-#ifdef ODIN_USE_GSL
+//#ifdef ODIN_USE_GSL
     bind_gravitation<double>(m_gravitation, "");
-#endif
+//#endif
 }

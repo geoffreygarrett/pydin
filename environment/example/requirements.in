@@ -17,6 +17,7 @@ pyside6
 mayavi
 
 # optional requirements
+blenderproc
 h5py
 scikit-learn
 numba
